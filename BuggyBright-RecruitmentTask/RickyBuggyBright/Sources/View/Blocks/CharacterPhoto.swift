@@ -7,16 +7,16 @@ import UIKit
 import SwiftUI
 
 struct CharacterPhoto: View {
-    private let data: Data?
+    private let image: UIImage?
     
-    init(data: Data?) {
-        self.data = data
+    init(image: UIImage?) {
+        self.image = image
     }
     
     var body: some View {
-        if let data = data, let posterUIImage = UIImage(data: data) {
+        if let image {
             return AnyView(
-                Image(uiImage: posterUIImage)
+                Image(uiImage: image)
                     .resizable()
             )
         } else {
@@ -39,6 +39,6 @@ private extension CharacterPhoto {
 
 struct CharacterPhoto_Previews: PreviewProvider {
     static var previews: some View {
-        CharacterPhoto(data: nil)
+        CharacterPhoto(image: nil)
     }
 }

@@ -52,16 +52,6 @@ final class NetworkManager {
             .map(\.data)
     }
     
-    func publisher(fromURLString urlString: String) -> Publishers.MapError<Publishers.MapKeyPath<Publishers.FlatMap<URLSession.DataTaskPublisher, Publishers.ReceiveOn<Publishers.SetFailureType<Optional<URL>.Publisher, URLError>, DispatchQueue>>, Data>, Error> {
-        return Just(urlString)
-            .compactMap(URL.init)
-            .setFailureType(to: URLError.self)
-            .receive(on: DispatchQueue.main)
-            .flatMap(URLSession.shared.dataTaskPublisher(for:))
-            .map(\.data)
-            .mapError { $0 as Error }
-    }
-    
     
     func performApiRequest(request: URLRequest) async -> Result<(Data, URLResponse), NetworkManagerError> {
         return await Self.performRequest(
@@ -96,8 +86,6 @@ final class NetworkManager {
         urlSession: URLSession,
         request: URLRequest
     ) async -> Result<(Data, URLResponse), NetworkManagerError> {
-        let request = Int.random(in: 1...10) > 3 ? request : RequestThatShouldFail
-        
         do {
             return .success(try await urlSession.data(for: request))
         } catch {
@@ -110,7 +98,7 @@ final class NetworkManager {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "thisshouldfail.com"
-        components.path = "whatever"
+        components.path = "/whatever"
         var request = URLRequest(url: components.url!, timeoutInterval: 5.0)
         request.httpMethod = "GET"
         return request

@@ -14,7 +14,7 @@ struct CharactersListItemView: View {
     
     var body: some View {
         HStack {
-            CharacterPhoto(data: viewModel.characterImageData)
+            CharacterPhoto(image: viewModel.characterImage)
                 .aspectRatio(1, contentMode: .fill)
                 .frame(height: UIScreen.main.bounds.height / 5)
                 .cornerRadius(5)

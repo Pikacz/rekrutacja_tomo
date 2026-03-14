@@ -5,12 +5,13 @@
 
 import Combine
 import Foundation
+import UIKit
 
 final class CharacterDetailViewModel: ObservableObject {
     @Published var showsLocationDetailsView = false
 
     @Published private(set) var data: (characterDetails: CharacterResponseModel, location: LocationDetailsResponseModel)?
-    @Published private(set) var CharacterPhotoData: Data?
+    @Published private(set) var CharacterPhoto: UIImage?
     @Published private(set) var characterErrors: [APIError] = []
 
     @Published private(set) var title: String = "-"
@@ -53,19 +54,25 @@ final class CharacterDetailViewModel: ObservableObject {
                 self?.data = (characterDetail, location)
             })
             .store(in: &cancellables)
-
-        characterDetailsPublisher
-            .map(\.image)
-            .flatMap { imageURLString -> ImageDataPublisher in
-                guard let apiService = apiService else {
-                    return Empty().eraseToAnyPublisher()
+        
+        characterDetailsPublisher.sink { characterModel in
+            Task.detached {
+                var image: UIImage? = nil
+                if let imageUrl = URL(string: characterModel.image), let apiService {
+                    let imageResult = await apiService.downloadImage(url: imageUrl)
+                    switch (imageResult) {
+                    case .success(let _image):
+                        image = _image
+                    case .failure:
+                        break
+                    }
                 }
-                return apiService.imageDataPublisher(fromURLString: imageURLString)
+                DispatchQueue.main.async {
+                    self.CharacterPhoto = image
+                }
             }
-            .replaceError(with: Data())
-            .compactMap { $0 }
-            .assign(to: \.CharacterPhotoData, on: self)
-            .store(in: &cancellables)
+        }.store(in: &cancellables)
+
 
         characterDetailsPublisher
             .map(\.name)

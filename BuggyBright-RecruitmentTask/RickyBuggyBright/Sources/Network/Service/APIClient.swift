@@ -5,26 +5,33 @@
 
 import Foundation
 import Combine
+import UIKit
 
-final class APIClient: APIProtocol {
-    private let networkManager: NetworkManager?
+final class APIClient {
+    private let networkManager: NetworkManager
     
     init() {
-        self.networkManager = DIContainer.shared.resolve(NetworkManager.self)
+        // FIXME: This DI is convoluted
+        self.networkManager = DIContainer.shared.resolve(NetworkManager.self)!
     }
     
-    func imageDataPublisher(fromURLString urlString: String) -> ImageDataPublisher {
-        guard let networkManager = networkManager else { return Empty().eraseToAnyPublisher() }
-        
-        return Just(urlString)
-            .setFailureType(to: Error.self)
-            .flatMap(networkManager.publisher(fromURLString:))
-            .mapError { _ in APIError.imageDataRequestFailed }
-            .eraseToAnyPublisher()
+    func downloadImage(
+        url: URL
+    ) async -> Result<UIImage?, NetworkManagerError> {
+        let result = await networkManager.performStaticRequest(
+            request: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
+        )
+        return switch(result) {
+        case .success(let (data, _)):
+                .success(await ensureIsOnBackground { UIImage(data: data) })
+        case .failure(let error):
+                .failure(error)
+        }
     }
+    
+    
     
     func charactersPublisher() -> CharactersPublisher {
-        guard let networkManager = networkManager else { return Empty().eraseToAnyPublisher() }
 
         return Just("/api/character/[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]")
             .setFailureType(to: Error.self)
@@ -38,7 +45,6 @@ final class APIClient: APIProtocol {
     }
     
     func characterDetailPublisher(with id: String) -> CharacterDetailsPublisher {
-        guard let networkManager = networkManager else { return Empty().eraseToAnyPublisher() }
 
         return Just("/api/character/\(id)")
             .setFailureType(to: Error.self)
@@ -52,7 +58,6 @@ final class APIClient: APIProtocol {
     }
     
     func locationPublisher(with id: String) -> LocationPublisher {
-        guard let networkManager = networkManager else { return Empty().eraseToAnyPublisher() }
 
         return Just("/api/location/\(id)")
             .setFailureType(to: Error.self)
@@ -63,5 +68,18 @@ final class APIClient: APIProtocol {
                 return APIError.locationRequestFailed
             }
             .eraseToAnyPublisher()
+    }
+}
+
+// I want to be 100% sure that i do not block main thread by doing long task.
+// At the moment I'm not aware of API that guarantes that…
+private func ensureIsOnBackground<T>(work: @escaping () -> T) async -> T {
+    guard Thread.isMainThread else {
+        return work()
+    }
+    return await withUnsafeContinuation { continuation in
+        DispatchQueue.global().async {
+            continuation.resume(returning: work())
+        }
     }
 }
