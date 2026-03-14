@@ -21,7 +21,7 @@ func diagnosticsAddBreadcrumb(
 func diagnosticsNonFatalError(
     message: String,
     parameters: [String: Any] = [:],
-    crashOnDebug: Bool = true
+    crashOnDebug: Bool
 ) {
     #if DEBUG
     if crashOnDebug {

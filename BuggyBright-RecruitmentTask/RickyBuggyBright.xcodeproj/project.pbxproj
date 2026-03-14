@@ -25,7 +25,6 @@
 		C5B576A82F659A4C00902D32 /* CharacterPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B5768F2F659A4C00902D32 /* CharacterPhoto.swift */; };
 		C5B576A92F659A4C00902D32 /* CharacterDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576962F659A4C00902D32 /* CharacterDetailViewModel.swift */; };
 		C5B576AA2F659A4C00902D32 /* APIServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B5768B2F659A4C00902D32 /* APIServiceProtocol.swift */; };
-		C5B576AB2F659A4C00902D32 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576872F659A4C00902D32 /* NetworkManager.swift */; };
 		C5B576AC2F659A4C00902D32 /* FetchRetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B5769A2F659A4C00902D32 /* FetchRetryView.swift */; };
 		C5B576AD2F659A4C00902D32 /* CharactersResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576842F659A4C00902D32 /* CharactersResponseModel.swift */; };
 		C5B576AE2F659A4C00902D32 /* CharacterDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576952F659A4C00902D32 /* CharacterDetailView.swift */; };
@@ -57,7 +56,6 @@
 		C5B576822F659A4C00902D32 /* SortMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortMethod.swift; sourceTree = "<group>"; };
 		C5B576842F659A4C00902D32 /* CharactersResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersResponseModel.swift; sourceTree = "<group>"; };
 		C5B576852F659A4C00902D32 /* LocationDetailsResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDetailsResponseModel.swift; sourceTree = "<group>"; };
-		C5B576872F659A4C00902D32 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		C5B5768A2F659A4C00902D32 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		C5B5768B2F659A4C00902D32 /* APIServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIServiceProtocol.swift; sourceTree = "<group>"; };
 		C5B5768D2F659A4C00902D32 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
@@ -157,14 +155,6 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		C5B576892F659A4C00902D32 /* Manager */ = {
-			isa = PBXGroup;
-			children = (
-				C5B576872F659A4C00902D32 /* NetworkManager.swift */,
-			);
-			path = Manager;
-			sourceTree = "<group>";
-		};
 		C5B5768C2F659A4C00902D32 /* Service */ = {
 			isa = PBXGroup;
 			children = (
@@ -177,7 +167,6 @@
 		C5B5768E2F659A4C00902D32 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				C5B576892F659A4C00902D32 /* Manager */,
 				C5B5768C2F659A4C00902D32 /* Service */,
 				C5B5768D2F659A4C00902D32 /* APIError.swift */,
 			);
@@ -365,7 +354,6 @@
 				C5B576A82F659A4C00902D32 /* CharacterPhoto.swift in Sources */,
 				C5B576A92F659A4C00902D32 /* CharacterDetailViewModel.swift in Sources */,
 				C5B576AA2F659A4C00902D32 /* APIServiceProtocol.swift in Sources */,
-				C5B576AB2F659A4C00902D32 /* NetworkManager.swift in Sources */,
 				C5B576AC2F659A4C00902D32 /* FetchRetryView.swift in Sources */,
 				C5B576AD2F659A4C00902D32 /* CharactersResponseModel.swift in Sources */,
 				C5B576AE2F659A4C00902D32 /* CharacterDetailView.swift in Sources */,

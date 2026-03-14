@@ -6,10 +6,10 @@
 import SwiftUI
 
 struct FetchRetryView: View {
-    private let errors: [APIError]
+    private let errors: [String]
     private let onRetry: () -> Void
     
-    init(errors: [APIError], onRetry: @escaping () -> Void) {
+    init(errors: [String], onRetry: @escaping () -> Void) {
         self.errors = errors
         self.onRetry = onRetry
     }
@@ -24,7 +24,7 @@ struct FetchRetryView: View {
                 
                 VStack {
                     ForEach(errors, id: \.self) { error in
-                        Text(error.localizedDescription)
+                        Text(error)
                             .font(.body)
                             .foregroundColor(.secondary)
                     }
@@ -46,6 +46,6 @@ struct FetchRetryView: View {
 
 struct FetchRetryView_Previews: PreviewProvider {
     static var previews: some View {
-        FetchRetryView(errors: [.locationRequestFailed], onRetry: {})
+        FetchRetryView(errors: ["Could not get details of location"], onRetry: {})
     }
 }

@@ -11,7 +11,7 @@ final class AppMainViewModel: ObservableObject {
     @Published var sortMethod: SortMethod = .name
     @Published var characters: [CharacterResponseModel] = []
 
-    @Published private(set) var characterErrors: [APIError] = []
+    @Published private(set) var characterErrors: [ApiClientError] = []
     @Published private(set) var sortMethodDescription: String = "Choose Sorting"
 
     private let showsSortActionSheetSubject = CurrentValueSubject<Bool?, Never>(nil)
@@ -57,22 +57,18 @@ final class AppMainViewModel: ObservableObject {
 
         isLoading = true
 
-        let apiService = DIContainer.shared.resolve(APIClient.self)
-        
-        apiService?.charactersPublisher()
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                switch completion {
-                case let .failure(error):
-                    self?.characterErrors.append(error)
-                case .finished:
-                    break
+        let apiService = DIContainer.shared.resolve(APIClient.self)!
+        Task.detached {
+            let result = await apiService.downloadCharacters()
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let characters):
+                    self.characters = characters
+                case .failure(let error):
+                    self.characterErrors.append(error)
                 }
-                
-                self?.isLoading = false
-            }, receiveValue: { [weak self] characters in
-                self?.characters = characters
-            })
-            .store(in: &cancellables)
+                self.isLoading = false
+            }
+        }
     }
 }
