@@ -13,7 +13,7 @@ final class NetworkManager: NetworkManagerProtocol {
     // FIXME: 2 - Refactor - add support for different properties eg. POST, httpBody, different timeouts etc.
     func publisher(path: String) -> Publishers.MapKeyPath<Publishers.MapError<URLSession.DataTaskPublisher, Error>, Data> {
         var components = URLComponents()
-        components.scheme = "http"
+        components.scheme = "https"
         // This is inteded, if you decide to move this code around please keep functionallity to random fail request
         components.host = Int.random(in: 1...10) > 3 ? "rickandmortyapi.com" : NetworkManager.RANDOM_HOST_NAME_TO_FAIL_REQUEST
         components.path = path
