@@ -12,6 +12,8 @@
 		2C2308C6282A3FD9003EC7DC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C2308C5282A3FD9003EC7DC /* Preview Assets.xcassets */; };
 		2C2308D0282A3FD9003EC7DC /* CharacterDetailViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2308CF282A3FD9003EC7DC /* CharacterDetailViewModelTests.swift */; };
 		2C2308ED282A413B003EC7DC /* CharactersListItemViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2308EC282A413B003EC7DC /* CharactersListItemViewModelTests.swift */; };
+		C539F2542F65EFDC008E28D0 /* AppRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C539F2532F65EFCD008E28D0 /* AppRepository.swift */; };
+		C539F2562F65F2F0008E28D0 /* CommonExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C539F2552F65F2EB008E28D0 /* CommonExtensions.swift */; };
 		C5B5769D2F659A4C00902D32 /* SortMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576822F659A4C00902D32 /* SortMethod.swift */; };
 		C5B5769E2F659A4C00902D32 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B5768A2F659A4C00902D32 /* APIClient.swift */; };
 		C5B5769F2F659A4C00902D32 /* CharactersListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576972F659A4C00902D32 /* CharactersListItemView.swift */; };
@@ -51,6 +53,8 @@
 		2C2308CB282A3FD9003EC7DC /* RickyBuggyBrightTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RickyBuggyBrightTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C2308CF282A3FD9003EC7DC /* CharacterDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailViewModelTests.swift; sourceTree = "<group>"; };
 		2C2308EC282A413B003EC7DC /* CharactersListItemViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersListItemViewModelTests.swift; sourceTree = "<group>"; };
+		C539F2532F65EFCD008E28D0 /* AppRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRepository.swift; sourceTree = "<group>"; };
+		C539F2552F65F2EB008E28D0 /* CommonExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonExtensions.swift; sourceTree = "<group>"; };
 		C5B576802F659A4C00902D32 /* AppearanceFrequency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceFrequency.swift; sourceTree = "<group>"; };
 		C5B576812F659A4C00902D32 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		C5B576822F659A4C00902D32 /* SortMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortMethod.swift; sourceTree = "<group>"; };
@@ -209,6 +213,8 @@
 		C5B5769C2F659A4C00902D32 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				C539F2552F65F2EB008E28D0 /* CommonExtensions.swift */,
+				C539F2532F65EFCD008E28D0 /* AppRepository.swift */,
 				C5B576D32F65CF7500902D32 /* Diagnostics.swift */,
 				C5B576832F659A4C00902D32 /* Common */,
 				C5B576862F659A4C00902D32 /* Model */,
@@ -347,10 +353,12 @@
 				C5B576A02F659A4C00902D32 /* LocationDetailsResponseModel.swift in Sources */,
 				C5B576A12F659A4C00902D32 /* AppMainViewModel.swift in Sources */,
 				C5B576A32F659A4C00902D32 /* CharactersListView.swift in Sources */,
+				C539F2542F65EFDC008E28D0 /* AppRepository.swift in Sources */,
 				C5B576A42F659A4C00902D32 /* AppMainView.swift in Sources */,
 				C5B576A52F659A4C00902D32 /* APIError.swift in Sources */,
 				C5B576A62F659A4C00902D32 /* TextExtensions.swift in Sources */,
 				C5B576A72F659A4C00902D32 /* DIContainer.swift in Sources */,
+				C539F2562F65F2F0008E28D0 /* CommonExtensions.swift in Sources */,
 				C5B576A82F659A4C00902D32 /* CharacterPhoto.swift in Sources */,
 				C5B576A92F659A4C00902D32 /* CharacterDetailViewModel.swift in Sources */,
 				C5B576AA2F659A4C00902D32 /* APIServiceProtocol.swift in Sources */,
@@ -507,6 +515,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"RickyBuggyBright/Preview Content\"";
+				DEVELOPMENT_TEAM = 3WS95QAWS9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -519,7 +528,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = brightinventions.pl.RickyBuggyBright;
+				PRODUCT_BUNDLE_IDENTIFIER = brightinventions.pl.RickyBuggyBright.pawel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -535,6 +544,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"RickyBuggyBright/Preview Content\"";
+				DEVELOPMENT_TEAM = 3WS95QAWS9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -547,7 +557,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = brightinventions.pl.RickyBuggyBright;
+				PRODUCT_BUNDLE_IDENTIFIER = brightinventions.pl.RickyBuggyBright.pawel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

@@ -14,7 +14,7 @@ enum ApiClientError: Error {
 }
 
 
-final class APIClient {
+final class APIClient: Sendable {
     private let baseUrl: String = "https://rickandmortyapi.com"
     private let networkManager: NetworkManager
     
@@ -132,7 +132,7 @@ enum NetworkManagerError: Error {
 }
 
 
-final class NetworkManager {
+final class NetworkManager: Sendable {
     private let apiUrlSession = URLSession.shared
     private let staticDataUrlSession = {
         let cache = URLCache(
