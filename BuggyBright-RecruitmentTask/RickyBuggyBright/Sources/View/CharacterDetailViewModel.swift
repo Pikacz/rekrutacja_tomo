@@ -12,7 +12,7 @@ final class CharacterDetailViewModel: ObservableObject {
 
     @Published private(set) var data: (characterDetails: CharacterResponseModel, location: LocationDetailsResponseModel)?
     @Published private(set) var CharacterPhoto: UIImage?
-    @Published private(set) var characterErrors: [APIError] = []
+    @Published private(set) var characterErrors: [ApiClientError] = []
 
     @Published private(set) var title: String = "-"
     @Published private(set) var popularityName: String = "-"
@@ -24,7 +24,7 @@ final class CharacterDetailViewModel: ObservableObject {
     private let showsLocationDetailsSubject = CurrentValueSubject<Bool?, Never>(nil)
 
     private let characterIDSubject = CurrentValueSubject<Int?, Never>(nil)
-    private let dataSubject = CurrentValueSubject<(characterDetails: CharacterResponseModel, location: LocationDetailsResponseModel)?, Never>(nil)
+    private let dataSubject = PassthroughSubject<(characterDetails: CharacterResponseModel, location: LocationDetailsResponseModel), Never>()
 
     private var isLoading = false
     private var cancellables = Set<AnyCancellable>()
@@ -48,9 +48,7 @@ final class CharacterDetailViewModel: ObservableObject {
             .map(\.characterDetails)
 
         dataPublisher
-            .sink(receiveCompletion: { [weak self] completion in
-                self?.characterErrors.append(.characterDetailRequestFailed)
-            }, receiveValue: { [weak self] characterDetail, location in
+            .sink(receiveValue: { [weak self] characterDetail, location in
                 self?.data = (characterDetail, location)
             })
             .store(in: &cancellables)
@@ -109,28 +107,36 @@ final class CharacterDetailViewModel: ObservableObject {
     
     func requestData() {
         guard isLoading == false else { return }
+        guard let characterID = characterIDSubject.value else { return }
+        let apiService = DIContainer.shared.resolve(APIClient.self)!
+        
         
         data = nil
         characterErrors.removeAll()
         isLoading = true
-
-        if let apiService = DIContainer.shared.resolve(APIClient.self), let characterID = characterIDSubject.value {
-            Publishers.Zip(apiService.characterDetailPublisher(with: String(characterID)),
-                           // FIXME: 11 - FIX so location is fetched based on character location id
-                           apiService.locationPublisher(with: "2"))
-                .sink(receiveCompletion: { [weak self] completion in
-                    switch completion {
-                    case let .failure(error):
-                        self?.characterErrors.append(error)
-                    case .finished:
-                        break
+        
+        Task.detached {
+            let characterDetailsResponse = await apiService.downloadCharacterDetails(id: "\(characterID)")
+            switch characterDetailsResponse {
+            case .success(let characterDetails):
+                // FIXME: 11 - FIX so location is fetched based on character location id
+                let locationDetailsResponse = await apiService.downloadLocationDetails(id: "2")
+                DispatchQueue.main.async {
+                    switch locationDetailsResponse {
+                    case .success(let locationDetails):
+                        self.dataSubject.send((characterDetails, locationDetails))
+                    case .failure(let error):
+                        self.characterErrors.append(error)
                     }
-
-                    self?.isLoading = false
-                }, receiveValue: { [weak self] characterDetail, comments in
-                    self?.dataSubject.send((characterDetail, comments))
-                })
-                .store(in: &cancellables)
+                    self.isLoading = false
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    self.characterErrors.append(error)
+                }
+            }
+            
         }
     }
 }

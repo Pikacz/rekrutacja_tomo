@@ -40,7 +40,7 @@ private extension CharacterDetailView {
                 }
             }
         } else if viewModel.characterErrors.isEmpty == false {
-            FetchRetryView(errors: viewModel.characterErrors.map { $0.localizedDescription }, onRetry: viewModel.requestData)
+            FetchRetryView(errors: viewModel.characterErrors, onRetry: viewModel.requestData)
         } else {
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle())

@@ -35,7 +35,7 @@ private extension AppMainView {
             CharactersListView(characters: $viewModel.characters, sortMethod: $viewModel.sortMethod)
         } else if viewModel.characterErrors.isEmpty == false {
             // FIXME: Error messages
-            FetchRetryView(errors: viewModel.characterErrors.map { "\($0)" }, onRetry: {
+            FetchRetryView(errors: viewModel.characterErrors, onRetry: {
                 viewModel.requestData()
             })
         } else {

@@ -7,10 +7,12 @@ import Foundation
 import Combine
 import UIKit
 
+
 enum ApiClientError: Error {
     case networkError(error: NetworkManagerError)
     case unexpectedError
 }
+
 
 final class APIClient {
     private let baseUrl: String = "https://rickandmortyapi.com"
@@ -36,9 +38,30 @@ final class APIClient {
     }
     
     func downloadCharacters() async -> Result<[CharacterResponseModel], ApiClientError> {
-        let request = URLRequest(
-            url: URL(string: baseUrl + "/api/character/[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]")!
+        return await downloadAndParse(
+            request: URLRequest(
+                url: URL(string: baseUrl + "/api/character/[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]")!
+            )
         )
+    }
+    
+    func downloadCharacterDetails(id: String) async -> Result<CharacterResponseModel, ApiClientError> {
+        return await downloadAndParse(
+            request: URLRequest(
+                url: URL(string: baseUrl + "/api/character/\(id)")!
+            )
+        )
+    }
+    
+    func downloadLocationDetails(id: String) async -> Result<LocationDetailsResponseModel, ApiClientError> {
+        return await downloadAndParse(
+            request: URLRequest(
+                url: URL(string: baseUrl + "/api/location/\(id)")!
+            )
+        )
+    }
+    
+    private func downloadAndParse<T: Decodable>(request: URLRequest) async -> Result<T, ApiClientError> {
         let result = await networkManager.performApiRequest(request: request)
         return switch(result) {
         case .success(let (data, _)):
@@ -53,33 +76,8 @@ final class APIClient {
                 .failure(.networkError(error: error))
         }
     }
-    
-    func characterDetailPublisher(with id: String) -> CharacterDetailsPublisher {
-
-        return Just("/api/character/\(id)")
-            .setFailureType(to: Error.self)
-            .flatMap(networkManager.publisher(path:))
-            .decode(type: CharacterResponseModel.self, decoder: JSONDecoder())
-            .mapError { error in
-                debugPrint(error)
-                return APIError.characterDetailRequestFailed
-            }
-            .eraseToAnyPublisher()
-    }
-    
-    func locationPublisher(with id: String) -> LocationPublisher {
-
-        return Just("/api/location/\(id)")
-            .setFailureType(to: Error.self)
-            .flatMap(networkManager.publisher(path:))
-            .decode(type: LocationDetailsResponseModel.self, decoder: JSONDecoder())
-            .mapError { error in
-                debugPrint(error)
-                return APIError.locationRequestFailed
-            }
-            .eraseToAnyPublisher()
-    }
 }
+
 
 private let jsonDecoder = JSONDecoder()
 private func decode<T: Decodable>(
@@ -106,6 +104,7 @@ private func decode<T: Decodable>(
     }
 }
 
+
 // If you use Thread.isMainThread in async function you would get warning
 // yet if you do it in normal function everything is fine
 // It's nice to know that Swift warnings are not just random heuristics, don't you think?
@@ -128,13 +127,12 @@ private func ensureIsOnBackground<T>(work: @escaping () -> T) async -> T {
 }
 
 
-enum NetworkManagerError: Swift.Error {
+enum NetworkManagerError: Error {
     case networkingError
 }
 
 
 final class NetworkManager {
-    
     private let apiUrlSession = URLSession.shared
     private let staticDataUrlSession = {
         let cache = URLCache(
@@ -147,31 +145,6 @@ final class NetworkManager {
         return URLSession(configuration: configuration)
     }()
     
-    
-    
-    
-    
-    static let RANDOM_HOST_NAME_TO_FAIL_REQUEST = "thisshouldfail.com"
-    
-    // FIXME: 2 - Refactor - add support for different properties eg. POST, httpBody, different timeouts etc.
-    func publisher(path: String) -> Publishers.MapKeyPath<Publishers.MapError<URLSession.DataTaskPublisher, Error>, Data> {
-        var components = URLComponents()
-        components.scheme = "https"
-        // This is inteded, if you decide to move this code around please keep functionallity to random fail request
-        components.host = Int.random(in: 1...10) > 3 ? "rickandmortyapi.com" : NetworkManager.RANDOM_HOST_NAME_TO_FAIL_REQUEST
-        components.path = path
-        
-        // FIXME: 3 - Add "guard let url = components.url else..."
-        
-        var request = URLRequest(url: components.url!, timeoutInterval: 5)
-        request.httpMethod = "GET"
-
-        return URLSession.shared.dataTaskPublisher(for: request)
-            .mapError { $0 as Error }
-            .map(\.data)
-    }
-    
-    
     func performApiRequest(request: URLRequest) async -> Result<(Data, URLResponse), NetworkManagerError> {
         return await Self.performRequest(
             urlSession: apiUrlSession,
@@ -183,22 +156,6 @@ final class NetworkManager {
         return await Self.performRequest(
             urlSession: staticDataUrlSession, request: request
         )
-    }
-    
-    static func createRequest(
-        path: String,
-        httpMethod: String = "GET",
-        httpBody: Data? = nil,
-        timeoutInterval: TimeInterval = 5.0
-    ) -> URLRequest {
-        var components = URLComponents()
-        components.scheme = "https"
-        components.host = "rickandmortyapi.com"
-        components.path = path
-        var request = URLRequest(url: components.url!, timeoutInterval: timeoutInterval)
-        request.httpMethod = httpMethod
-        request.httpBody = httpBody
-        return request
     }
     
     private static func performRequest(
