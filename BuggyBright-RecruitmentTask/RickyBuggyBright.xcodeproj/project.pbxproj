@@ -17,7 +17,6 @@
 		C5B5769F2F659A4C00902D32 /* CharactersListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576972F659A4C00902D32 /* CharactersListItemView.swift */; };
 		C5B576A02F659A4C00902D32 /* LocationDetailsResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576852F659A4C00902D32 /* LocationDetailsResponseModel.swift */; };
 		C5B576A12F659A4C00902D32 /* AppMainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576942F659A4C00902D32 /* AppMainViewModel.swift */; };
-		C5B576A22F659A4C00902D32 /* NetworkManagerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576882F659A4C00902D32 /* NetworkManagerProtocol.swift */; };
 		C5B576A32F659A4C00902D32 /* CharactersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576992F659A4C00902D32 /* CharactersListView.swift */; };
 		C5B576A42F659A4C00902D32 /* AppMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576932F659A4C00902D32 /* AppMainView.swift */; };
 		C5B576A52F659A4C00902D32 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B5768D2F659A4C00902D32 /* APIError.swift */; };
@@ -58,7 +57,6 @@
 		C5B576842F659A4C00902D32 /* CharactersResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersResponseModel.swift; sourceTree = "<group>"; };
 		C5B576852F659A4C00902D32 /* LocationDetailsResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDetailsResponseModel.swift; sourceTree = "<group>"; };
 		C5B576872F659A4C00902D32 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
-		C5B576882F659A4C00902D32 /* NetworkManagerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManagerProtocol.swift; sourceTree = "<group>"; };
 		C5B5768A2F659A4C00902D32 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		C5B5768B2F659A4C00902D32 /* APIServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIServiceProtocol.swift; sourceTree = "<group>"; };
 		C5B5768D2F659A4C00902D32 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
@@ -161,7 +159,6 @@
 			isa = PBXGroup;
 			children = (
 				C5B576872F659A4C00902D32 /* NetworkManager.swift */,
-				C5B576882F659A4C00902D32 /* NetworkManagerProtocol.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -356,7 +353,6 @@
 				C5B5769F2F659A4C00902D32 /* CharactersListItemView.swift in Sources */,
 				C5B576A02F659A4C00902D32 /* LocationDetailsResponseModel.swift in Sources */,
 				C5B576A12F659A4C00902D32 /* AppMainViewModel.swift in Sources */,
-				C5B576A22F659A4C00902D32 /* NetworkManagerProtocol.swift in Sources */,
 				C5B576A32F659A4C00902D32 /* CharactersListView.swift in Sources */,
 				C5B576A42F659A4C00902D32 /* AppMainView.swift in Sources */,
 				C5B576A52F659A4C00902D32 /* APIError.swift in Sources */,

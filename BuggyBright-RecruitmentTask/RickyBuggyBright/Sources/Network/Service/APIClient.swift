@@ -7,7 +7,7 @@ import Foundation
 import Combine
 
 final class APIClient: APIProtocol {
-    private let networkManager: NetworkManagerProtocol?
+    private let networkManager: NetworkManager?
     
     init() {
         self.networkManager = DIContainer.shared.resolve(NetworkManager.self)
