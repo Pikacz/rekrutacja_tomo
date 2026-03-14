@@ -31,6 +31,7 @@
 		C5B576AE2F659A4C00902D32 /* CharacterDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576952F659A4C00902D32 /* CharacterDetailView.swift */; };
 		C5B576AF2F659A4C00902D32 /* AppearanceFrequency.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576802F659A4C00902D32 /* AppearanceFrequency.swift */; };
 		C5B576B02F659A4C00902D32 /* CharactersListItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576982F659A4C00902D32 /* CharactersListItemViewModel.swift */; };
+		C5B576D42F65CF7A00902D32 /* Diagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576D32F65CF7500902D32 /* Diagnostics.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +71,7 @@
 		C5B576982F659A4C00902D32 /* CharactersListItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersListItemViewModel.swift; sourceTree = "<group>"; };
 		C5B576992F659A4C00902D32 /* CharactersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersListView.swift; sourceTree = "<group>"; };
 		C5B5769A2F659A4C00902D32 /* FetchRetryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRetryView.swift; sourceTree = "<group>"; };
+		C5B576D32F65CF7500902D32 /* Diagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -218,6 +220,7 @@
 		C5B5769C2F659A4C00902D32 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				C5B576D32F65CF7500902D32 /* Diagnostics.swift */,
 				C5B576832F659A4C00902D32 /* Common */,
 				C5B576862F659A4C00902D32 /* Model */,
 				C5B5768E2F659A4C00902D32 /* Network */,
@@ -349,6 +352,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5B5769D2F659A4C00902D32 /* SortMethod.swift in Sources */,
+				C5B576D42F65CF7A00902D32 /* Diagnostics.swift in Sources */,
 				C5B5769E2F659A4C00902D32 /* APIClient.swift in Sources */,
 				C5B5769F2F659A4C00902D32 /* CharactersListItemView.swift in Sources */,
 				C5B576A02F659A4C00902D32 /* LocationDetailsResponseModel.swift in Sources */,

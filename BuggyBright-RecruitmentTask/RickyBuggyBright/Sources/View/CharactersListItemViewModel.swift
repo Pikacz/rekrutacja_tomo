@@ -21,6 +21,8 @@ final class CharactersListItemViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     init(character: CharacterResponseModel) {
+        // FIXME: Our usage of SwiftUI is CRAP. This init is called multiple times…
+        print("🦕🦖 CharactersListItemViewModel.init \(character.id)")
         let apiService = DIContainer.shared.resolve(APIClient.self)
         let characterSharedPublisher = characterSubject
             .compactMap { $0 }

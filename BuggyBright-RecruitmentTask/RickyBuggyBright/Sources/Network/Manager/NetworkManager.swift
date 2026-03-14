@@ -86,9 +86,21 @@ final class NetworkManager {
         urlSession: URLSession,
         request: URLRequest
     ) async -> Result<(Data, URLResponse), NetworkManagerError> {
+        diagnosticsAddBreadcrumb(message: "Starting \(request.diagnosticDescription)")
+        let requestStart = diagnosticsCheapToUseTime()
         do {
-            return .success(try await urlSession.data(for: request))
+            let result = try await urlSession.data(for: request)
+            let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - requestStart)
+            diagnosticsAddBreadcrumb(message: "Request \(request.diagnosticDescription) succeded after \(elapsedMs) ms")
+            return .success(result)
         } catch {
+            let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - requestStart)
+            diagnosticsAddBreadcrumb(
+                message: "Request \(request.diagnosticDescription) failed after \(elapsedMs) ms",
+                parameters: [
+                    "error": error
+                ]
+            )
             // FIXME: check what errors are equivalent to noInternetConnection
             return .failure(NetworkManagerError.networkingError)
         }
@@ -103,4 +115,11 @@ final class NetworkManager {
         request.httpMethod = "GET"
         return request
     }()
+}
+
+
+private extension URLRequest {
+    var diagnosticDescription: String {
+        return url?.absoluteString ?? "--- we do not have url WTF bro? ---"
+    }
 }
