@@ -10,7 +10,7 @@ import UIKit
 final class CharacterDetailViewModel: ObservableObject {
     @Published var showsLocationDetailsView = false
 
-    @Published private(set) var data: (characterDetails: CharacterResponseModel, location: LocationDetailsResponseModel)?
+    @Published private(set) var data: (characterDetails: CharacterDetailsResponseModel, location: LocationDetailsResponseModel)?
     @Published private(set) var CharacterPhotoURL: URL?
     @Published private(set) var characterErrors: [ApiClientError] = []
 
@@ -19,12 +19,12 @@ final class CharacterDetailViewModel: ObservableObject {
     @Published private(set) var url: String = "-"
     @Published private(set) var created: String = "-"
     
-    @Published private(set) var details: String = "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat."
+    @Published private(set) var details: String = "-"
     
     private let showsLocationDetailsSubject = CurrentValueSubject<Bool?, Never>(nil)
 
     private let characterIDSubject = CurrentValueSubject<Int?, Never>(nil)
-    private let dataSubject = PassthroughSubject<(characterDetails: CharacterResponseModel, location: LocationDetailsResponseModel), Never>()
+    private let dataSubject = PassthroughSubject<(characterDetails: CharacterDetailsResponseModel, location: LocationDetailsResponseModel), Never>()
 
     private var isLoading = false
     private var cancellables = Set<AnyCancellable>()
@@ -54,18 +54,18 @@ final class CharacterDetailViewModel: ObservableObject {
             .store(in: &cancellables)
         
         characterDetailsPublisher
-            .map { URL(string: $0.image) }
+            .map { URL(string: $0.character.image) }
             .assign(to: \.CharacterPhotoURL, on: self)
             .store(in: &cancellables)
 
 
         characterDetailsPublisher
-            .map(\.name)
+            .map(\.character.name)
             .assign(to: \.title, on: self)
             .store(in: &cancellables)
 
         characterDetailsPublisher
-            .map(\.episode)
+            .map(\.character.episode)
             .map(\.count)
             .compactMap(AppearanceFrequency.init(count:))
             .map(\.popularity)
@@ -73,14 +73,19 @@ final class CharacterDetailViewModel: ObservableObject {
             .store(in: &cancellables)
         
         characterDetailsPublisher
-            .map(\.url)
+            .map(\.character.url)
             .removeDuplicates()
             .assign(to: \.url, on: self)
             .store(in: &cancellables)
 
         characterDetailsPublisher
-            .map(\.created)
+            .map(\.character.created)
             .assign(to: \.created, on: self)
+            .store(in: &cancellables)
+        
+        characterDetailsPublisher
+            .map(\.details)
+            .assign(to: \.details, on: self)
             .store(in: &cancellables)
 
         characterIDSubject.send(characterId)

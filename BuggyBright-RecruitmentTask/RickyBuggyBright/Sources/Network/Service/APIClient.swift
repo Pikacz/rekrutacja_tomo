@@ -45,7 +45,7 @@ final class APIClient: Sendable {
         )
     }
     
-    func downloadCharacterDetails(id: String) async -> Result<CharacterResponseModel, ApiClientError> {
+    func downloadCharacterDetails(id: String) async -> Result<CharacterDetailsResponseModel, ApiClientError> {
         return await downloadAndParse(
             request: URLRequest(
                 url: URL(string: baseUrl + "/api/character/\(id)")!
@@ -85,6 +85,12 @@ private func decode<T: Decodable>(
     data: Data
 ) throws -> T {
     let parsingStart = diagnosticsCheapToUseTime()
+    #if DEBUG
+    if let text = String(data: data, encoding: .utf8) {
+        print(text)
+    }
+    #endif
+    
     do {
         let result = try jsonDecoder.decode(T.self, from: data)
         let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - parsingStart)

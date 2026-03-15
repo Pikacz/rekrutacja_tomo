@@ -14,14 +14,22 @@ import UIKit
 final class CharacterDetailsModel {
     private let id: Int
     
-    private let _lastApiDetails: CurrentValueSubject<
-        Result<CharacterResponseModel, ApiClientError>?,
+    private let _lastListResponse = CurrentValueSubject<CharacterResponseModel?, Never>(nil)
+    var lastListResponse: CharacterResponseModel? {
+        return _lastListResponse.value
+    }
+    var lastListResponsePublisher: AnyPublisher<CharacterResponseModel?, Never> {
+        return _lastListResponse.eraseToAnyPublisher()
+    }
+    
+    private let _lastApiDetails = CurrentValueSubject<
+        Result<CharacterDetailsResponseModel, ApiClientError>?,
         Never
-    >
-    var lastApiDetails: Result<CharacterResponseModel, ApiClientError>? {
+    >(nil)
+    var lastApiDetails: Result<CharacterDetailsResponseModel, ApiClientError>? {
         return _lastApiDetails.value
     }
-    var lastApiDetailsPublisher: AnyPublisher<Result<CharacterResponseModel, ApiClientError>?, Never> {
+    var lastApiDetailsPublisher: AnyPublisher<Result<CharacterDetailsResponseModel, ApiClientError>?, Never> {
         return _lastApiDetails.eraseToAnyPublisher()
     }
     
@@ -38,22 +46,17 @@ final class CharacterDetailsModel {
     
     init(character: CharacterResponseModel, apiClient: APIClient) {
         self.id = character.id
-        self._lastApiDetails = CurrentValueSubject(.success(character))
+        _lastListResponse.value = character
         self.apiClient = apiClient
     }
     
     init(id: Int, apiClient: APIClient) {
         self.id = id
-        self._lastApiDetails = CurrentValueSubject(nil)
         self.apiClient = apiClient
     }
     
-    func setDetails(characterDetails: CharacterResponseModel) {
-        requestId += 1
-        _lastApiDetails.value = .success(characterDetails)
-        if _isDownloading.value {
-            _isDownloading.value = false
-        }
+    func setListData(characterDetails: CharacterResponseModel) {
+        _lastListResponse.value = characterDetails
     }
     
     func downloadIfNeeded() {
@@ -133,7 +136,7 @@ final class CharactersRepository {
                     self.tryClearCacheCounter -= characters.count - 1 // we do not need to remove nil
                     self._lastAllCharactersLifetime = characters.map {
                         let details = self.getDetails(id: $0.id)
-                        details.setDetails(characterDetails: $0)
+                        details.setListData(characterDetails: $0)
                         return details
                     }
                 case .failure:
