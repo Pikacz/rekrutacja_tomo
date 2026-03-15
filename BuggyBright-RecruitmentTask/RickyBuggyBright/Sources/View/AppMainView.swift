@@ -111,9 +111,7 @@ struct AppMainView: View {
         .onAppear {
             viewModel.downloadIfNeeded()
         }
-        .actionSheet(isPresented: $viewModel.showsSortActionSheet) {
-            sortActionSheet
-        }
+        
     }
     
     private func setSortingAnimated(_ method: SortMethod?) {
@@ -148,29 +146,64 @@ struct AppMainView: View {
         Button(action: { viewModel.showsSortActionSheet = true }) {
             Text("Choose Sorting")
         }
-    }
-    
-    private var sortActionSheet: ActionSheet {
-        ActionSheet(
-            title: Text("Sort method"),
-            message: Text("Choose sorting method"),
-            buttons: [
-                .default(Text("Episodes Count")) {
-                    setSortingAnimated(.episodesCount)
-                },
-                .default(Text("Name")) {
-                    setSortingAnimated(.name)
-                    
-                },
-                .default(Text("Default")) {
-                    setSortingAnimated(nil)
-                },
-                
-                .cancel(Text("Cancel")),
-            ]
+        .addSortActionSheet(
+            isPresented: $viewModel.showsSortActionSheet,
+            onSelect: {
+                self.setSortingAnimated($0)
+            }
         )
     }
 }
+
+private extension View {
+    @ViewBuilder
+    func addSortActionSheet(
+        isPresented: Binding<Bool>,
+        onSelect: @escaping @MainActor (SortMethod?) -> Void
+    ) -> some View {
+        if #available(iOS 26.0, *) {
+            self
+                .confirmationDialog(
+                    "Choose sorting method",
+                    isPresented: isPresented,
+                    titleVisibility: .visible
+                ) {
+                    Button("Episodes Count") {
+                        onSelect(.episodesCount)
+                    }
+                    Button("Name") {
+                        onSelect(.name)
+                    }
+                    Button("Default") {
+                        onSelect(nil)
+                    }
+                    
+                }
+        } else {
+            self.actionSheet(isPresented: isPresented) {
+                ActionSheet(
+                    title: Text("Sort method"),
+                    message: Text("Choose sorting method"),
+                    buttons: [
+                        .default(Text("Episodes Count")) {
+                            onSelect(.episodesCount)
+                        },
+                        .default(Text("Name")) {
+                            onSelect(.name)
+                            
+                        },
+                        .default(Text("Default")) {
+                            onSelect(nil)
+                        },
+                        
+                        .cancel(Text("Cancel")),
+                    ]
+                )
+            }
+        }
+    }
+}
+
 
 // MARK: - Preview
 
