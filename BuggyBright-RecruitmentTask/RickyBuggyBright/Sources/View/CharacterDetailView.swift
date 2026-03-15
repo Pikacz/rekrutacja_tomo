@@ -174,8 +174,6 @@ final class CharacterDetailViewModel: ObservableObject {
 }
 
 
-
-// FIXME: 9 - Fix title (character name) so it's displayed on the top, just below navigation bar
 struct CharacterDetailView: View {
     @StateObject var viewModel: CharacterDetailViewModel
     
@@ -187,19 +185,17 @@ struct CharacterDetailView: View {
     
     
     var body: some View {
-        NavigationView {
-            content
-                .navigationTitle(viewModel.title)
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: viewModel.downloadIfNeeded) {
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                        }
+        content
+            .navigationTitle(viewModel.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: viewModel.downloadIfNeeded) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
                     }
                 }
-                .id(viewModel.id)
-        }
+            }
+            .id(viewModel.id)
     }
 }
 
