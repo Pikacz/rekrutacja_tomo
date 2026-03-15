@@ -39,9 +39,16 @@ struct CharactersListItemView: View {
 
                 HStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 4) {
-                        // FIXME: 6 - Make URL tappable
-                        Text(url)
-
+                        if let parsedUrl = URL(string: url) {
+                            Text(url)
+                                .underline()
+                                .foregroundColor(.blue)
+                                .onTapGesture {
+                                    UIApplication.shared.open(parsedUrl)
+                                }
+                        } else {
+                            Text(url)
+                        }
                         Text(created)
                             .contentsStyle()
                     }
