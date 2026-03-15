@@ -5,6 +5,8 @@
 //  Created by Paweł Czerwinski on 14/03/2026.
 //
 
+import Foundation
+
 extension Result {
     var _isSuccess: Bool {
         if case .success = self {
@@ -28,5 +30,13 @@ func removeDead<Key: Hashable, T: AnyObject>(_ cache: inout [Key: WeakReference<
     }
     for key in toRemove {
         cache.removeValue(forKey: key)
+    }
+}
+
+private let nullObject = NSObject()
+
+extension ObjectIdentifier {
+    init(_ x: AnyObject?) {
+        self.init(x ?? nullObject)
     }
 }

@@ -11,7 +11,7 @@ final class CharacterDetailViewModel: ObservableObject {
     @Published var showsLocationDetailsView = false
 
     @Published private(set) var data: (characterDetails: CharacterResponseModel, location: LocationDetailsResponseModel)?
-    @Published private(set) var CharacterPhoto: UIImage?
+    @Published private(set) var CharacterPhotoURL: URL?
     @Published private(set) var characterErrors: [ApiClientError] = []
 
     @Published private(set) var title: String = "-"
@@ -53,23 +53,10 @@ final class CharacterDetailViewModel: ObservableObject {
             })
             .store(in: &cancellables)
         
-        characterDetailsPublisher.sink { characterModel in
-            Task.detached {
-                var image: UIImage? = nil
-                if let imageUrl = URL(string: characterModel.image), let apiService {
-                    let imageResult = await apiService.downloadImage(url: imageUrl)
-                    switch (imageResult) {
-                    case .success(let _image):
-                        image = _image
-                    case .failure:
-                        break
-                    }
-                }
-                DispatchQueue.main.async {
-                    self.CharacterPhoto = image
-                }
-            }
-        }.store(in: &cancellables)
+        characterDetailsPublisher
+            .map { URL(string: $0.image) }
+            .assign(to: \.CharacterPhotoURL, on: self)
+            .store(in: &cancellables)
 
 
         characterDetailsPublisher

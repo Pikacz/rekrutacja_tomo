@@ -57,7 +57,7 @@ private extension CharacterDetailView {
     // FIXME: 10 - Fix so image isn't cropped and still looks good (see Morty for example of how broken it is now)
     var photoSection: some View {
         VStack(alignment: .center, spacing: 8) {
-            CharacterPhoto(image: viewModel.CharacterPhoto)
+            CharacterPhoto(imageModel: viewModel.CharacterPhotoURL.map { AppRepository.shared.images.getImage(url: $0) })
                 .aspectRatio(1, contentMode: .fill)
                 .frame(height: UIScreen.main.bounds.height / 5)
                 .cornerRadius(5)

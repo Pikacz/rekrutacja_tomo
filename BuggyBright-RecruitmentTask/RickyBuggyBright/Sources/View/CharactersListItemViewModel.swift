@@ -12,9 +12,9 @@ final class CharactersListItemViewModel: ObservableObject {
     @Published private(set) var characterErrors: [APIError] = []
 
     @Published private(set) var title: String = "-"
-    @Published private(set) var characterImage: UIImage?
     @Published private(set) var created: String = "-"
     @Published private(set) var url: String = "-"
+    @Published private(set) var imageUrl: URL? = nil
 
     private let characterSubject = CurrentValueSubject<CharacterResponseModel?, Never>(nil)
 
@@ -33,23 +33,28 @@ final class CharactersListItemViewModel: ObservableObject {
             .assign(to: \.title, on: self)
             .store(in: &cancellables)
         
-        characterSharedPublisher.sink { characterModel in
-            Task.detached {
-                var image: UIImage? = nil
-                if let imageUrl = URL(string: characterModel.image), let apiService {
-                    let imageResult = await apiService.downloadImage(url: imageUrl)
-                    switch (imageResult) {
-                    case .success(let _image):
-                        image = _image
-                    case .failure:
-                        break
-                    }
-                }
-                DispatchQueue.main.async {
-                    self.characterImage = image
-                }
-            }
-        }.store(in: &cancellables)
+//        characterSharedPublisher.sink { characterModel in
+//            Task.detached {
+//                var image: UIImage? = nil
+//                if let imageUrl = URL(string: characterModel.image), let apiService {
+//                    let imageResult = await apiService.downloadImage(url: imageUrl)
+//                    switch (imageResult) {
+//                    case .success(let _image):
+//                        image = _image
+//                    case .failure:
+//                        break
+//                    }
+//                }
+//                DispatchQueue.main.async {
+//                    self.characterImage = image
+//                }
+//            }
+//        }.store(in: &cancellables)
+        
+        characterSharedPublisher
+            .map {URL(string: $0.image) }
+            .assign(to: \.imageUrl, on: self)
+            .store(in: &cancellables)
         
         characterSharedPublisher
             .map(\.created)
