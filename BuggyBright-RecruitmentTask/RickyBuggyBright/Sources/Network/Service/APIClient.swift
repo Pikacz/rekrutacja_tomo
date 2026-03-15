@@ -141,8 +141,15 @@ private func ensureIsOnBackground<T>(work: @escaping () -> T) async -> T {
 }
 
 
+// NOTE: This mapping was written in 15 minutes.
+// It probably require more research
 enum NetworkManagerError: Error {
-    case networkingError
+    // User disabled interent -> prompt to enable internet
+    case internetDisabled
+    // For example WI-FI have no acces to internet -> prompt to check other network
+    case noNetworkAccess
+    // Something happened (most likely timeout) -> prompt to try again later
+    case otherNetworkingError
 }
 
 
@@ -184,15 +191,31 @@ final class NetworkManager: Sendable {
             diagnosticsAddBreadcrumb(message: "Request \(request.diagnosticDescription) downloaded after \(elapsedMs) ms")
             return .success(result)
         } catch {
+            
+            let parsedError: NetworkManagerError
+            if let urlError = error as? URLError {
+                switch urlError.code {
+                case .notConnectedToInternet, .internationalRoamingOff, .dataNotAllowed:
+                    parsedError = .internetDisabled
+                case .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed, .networkConnectionLost:
+                    parsedError = .noNetworkAccess
+                default:
+                    parsedError = .otherNetworkingError
+                }
+            } else {
+                parsedError = .otherNetworkingError
+            }
+            
             let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - requestStart)
             diagnosticsAddBreadcrumb(
                 message: "Request \(request.diagnosticDescription) failed after \(elapsedMs) ms",
                 parameters: [
-                    "error": error
+                    "error": error,
+                    "parsedError": "\(parsedError)"
                 ]
             )
-            // FIXME: check what errors are equivalent to noInternetConnection
-            return .failure(NetworkManagerError.networkingError)
+            return .failure(parsedError)
+            
         }
     }
     
