@@ -26,12 +26,20 @@ final class APIClient: Sendable {
     func downloadImage(
         url: URL
     ) async -> Result<UIImage?, NetworkManagerError> {
+        let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
         let result = await networkManager.performStaticRequest(
-            request: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
+            request: request
         )
         return switch(result) {
         case .success(let (data, _)):
-                .success(await ensureIsOnBackground { UIImage(data: data) })
+                .success(await ensureIsOnBackground {
+                    let parsingStart = diagnosticsCheapToUseTime()
+                    let result = UIImage(data: data)
+                    let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - parsingStart)
+                    
+                    diagnosticsAddBreadcrumb(message: "Request \(request.diagnosticDescription) parsed image in \(elapsedMs) ms")
+                    return result
+                })
         case .failure(let error):
                 .failure(error)
         }
