@@ -296,8 +296,7 @@ private extension CharacterDetailView {
                 Button(action: {
                     viewModel.showsLocationDetailsView = true
                 }) {
-                    // FIXME: 12 - change to filled share icon using sfsymbols, confirm if functionallity works, fix if needed
-                    Image(systemName: "globe")
+                    Image(systemName: "square.and.arrow.up.fill")
                         .accentColor(.orange)
                 }
             }
