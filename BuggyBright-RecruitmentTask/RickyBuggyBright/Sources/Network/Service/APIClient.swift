@@ -85,11 +85,11 @@ private func decode<T: Decodable>(
     data: Data
 ) throws -> T {
     let parsingStart = diagnosticsCheapToUseTime()
-    #if DEBUG
-    if let text = String(data: data, encoding: .utf8) {
-        print(text)
-    }
-    #endif
+//    #if DEBUG
+//    if let text = String(data: data, encoding: .utf8) {
+//        print(text)
+//    }
+//    #endif
     
     do {
         let result = try jsonDecoder.decode(T.self, from: data)

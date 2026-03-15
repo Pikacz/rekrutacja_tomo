@@ -85,6 +85,7 @@ final class AppMainViewModel: ObservableObject {
 
 struct AppMainView: View {
     @StateObject var viewModel: AppMainViewModel
+    private let appRespository: AppRepository
     
     
 
@@ -93,6 +94,7 @@ struct AppMainView: View {
         appRespository: AppRepository
     ) {
         self._viewModel = StateObject(wrappedValue: AppMainViewModel(appRespository: appRespository))
+        self.appRespository = appRespository
     }
         
     var body: some View {
@@ -126,7 +128,11 @@ struct AppMainView: View {
     
     @ViewBuilder private var characterListView: some View {
         if viewModel.downloadedCharacters.isEmpty == false {
-            CharactersListView(characters: viewModel.downloadedCharacters, charactersSortedIndicies: viewModel.sortedCharactersIndicies)
+            CharactersListView(
+                characters: viewModel.downloadedCharacters,
+                charactersSortedIndicies: viewModel.sortedCharactersIndicies,
+                appRepository: appRespository
+            )
         } else if let downloadError = viewModel.downloadError {
             // FIXME: Error messages
             FetchRetryView(errors: [downloadError], onRetry: {

@@ -8,10 +8,16 @@ import SwiftUI
 struct CharactersListView: View {
     let characters: [CharacterResponseModel]
     let charactersSortedIndicies: [IndexWithId]
+    let appRepository: AppRepository
     
-    init(characters: [CharacterResponseModel], charactersSortedIndicies: [IndexWithId]) {
+    init(
+        characters: [CharacterResponseModel],
+        charactersSortedIndicies: [IndexWithId],
+        appRepository: AppRepository
+    ) {
         self.characters = characters
         self.charactersSortedIndicies = charactersSortedIndicies
+        self.appRepository = appRepository
     }
     
     var body: some View {
@@ -21,10 +27,7 @@ struct CharactersListView: View {
             
             NavigationLink {
                 CharacterDetailView(
-                    viewModel: CharacterDetailViewModel(
-                        characterId: character.id,
-                        name: character.name
-                    )
+                    id: character.id, appRepository: appRepository
                 )
             } label: {
                 CharactersListItemView(
@@ -42,6 +45,6 @@ struct CharactersListView: View {
 
 struct CharactersListView_Previews: PreviewProvider {
     static var previews: some View {
-        CharactersListView(characters: [.dummy], charactersSortedIndicies: [IndexWithId(index: 0, id: CharacterResponseModel.dummy.id)])
+        CharactersListView(characters: [.dummy], charactersSortedIndicies: [IndexWithId(index: 0, id: CharacterResponseModel.dummy.id)], appRepository: AppRepository.shared)
     }
 }
