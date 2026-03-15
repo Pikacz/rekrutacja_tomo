@@ -5,15 +5,14 @@
 
 import SwiftUI
 
+
+@MainActor
+private let appRepository = AppRepository()
+
 @main
 struct RickyBuggyBrightApp: App {
     
     @State var isListHidden = false
-    
-    init() {
-        DIContainer.shared.register(NetworkManager())
-        DIContainer.shared.register(APIClient())
-    }
     
     var body: some Scene {
         WindowGroup {
@@ -22,8 +21,7 @@ struct RickyBuggyBrightApp: App {
                     Button("Hide Content") {
                         isListHidden = true
                     }
-                    
-                    AppMainView(appRespository: AppRepository.shared)
+                    AppMainView(appRespository: appRepository)
                 }
                 .opacity(isListHidden ? 0 : 1)
                 .disabled(isListHidden)

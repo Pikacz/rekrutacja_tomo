@@ -34,7 +34,7 @@ struct CharactersListView: View {
                     title: character.name,
                     created: character.created,
                     url: character.url,
-                    image: AppRepository.shared.images.getOptionalImage(url: URL(string: character.image))
+                    image: appRepository.images.getOptionalImage(url: URL(string: character.image))
                 )
             }
         }
@@ -45,6 +45,10 @@ struct CharactersListView: View {
 
 struct CharactersListView_Previews: PreviewProvider {
     static var previews: some View {
-        CharactersListView(characters: [.dummy], charactersSortedIndicies: [IndexWithId(index: 0, id: CharacterResponseModel.dummy.id)], appRepository: AppRepository.shared)
+        CharactersListView(
+            characters: [.dummy],
+            charactersSortedIndicies: [IndexWithId(index: 0, id: CharacterResponseModel.dummy.id)],
+            appRepository: AppRepository.previewInstance
+        )
     }
 }

@@ -10,17 +10,20 @@ import UIKit
 
 enum ApiClientError: Error {
     case networkError(error: NetworkManagerError)
-    case unexpectedError
+    case unexpectedError(genericError: Error?)
 }
 
 
 final class APIClient: Sendable {
-    private let baseUrl: String = "https://rickandmortyapi.com"
+    private let baseUrl: String
     private let networkManager: NetworkManager
     
-    init() {
-        // FIXME: This DI is convoluted
-        self.networkManager = DIContainer.shared.resolve(NetworkManager.self)!
+    init(
+        baseUrl: String,
+        networkManager: NetworkManager
+    ) {
+        self.baseUrl = baseUrl
+        self.networkManager = networkManager
     }
     
     func downloadImage(
@@ -30,18 +33,21 @@ final class APIClient: Sendable {
         let result = await networkManager.performStaticRequest(
             request: request
         )
-        return switch(result) {
+        switch(result) {
         case .success(let (data, _)):
-                .success(await ensureIsOnBackground {
-                    let parsingStart = diagnosticsCheapToUseTime()
-                    let result = UIImage(data: data)
-                    let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - parsingStart)
-                    
-                    diagnosticsAddBreadcrumb(message: "Request \(request.diagnosticDescription) parsed image in \(elapsedMs) ms")
-                    return result
-                })
+#if DEBUG
+            print(data.base64EncodedString())
+#endif
+            return .success(await ensureIsOnBackground {
+                let parsingStart = diagnosticsCheapToUseTime()
+                let result = UIImage(data: data)
+                let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - parsingStart)
+                
+                diagnosticsAddBreadcrumb(message: "Request \(request.diagnosticDescription) parsed image in \(elapsedMs) ms")
+                return result
+            })
         case .failure(let error):
-                .failure(error)
+            return .failure(error)
         }
     }
     
@@ -77,7 +83,7 @@ final class APIClient: Sendable {
                 do {
                     return .success(try decode(request: request, data: data))
                 } catch {
-                    return .failure(.unexpectedError)
+                    return .failure(.unexpectedError(genericError: error))
                 }
             }
         case .failure(let error):
@@ -93,11 +99,11 @@ private func decode<T: Decodable>(
     data: Data
 ) throws -> T {
     let parsingStart = diagnosticsCheapToUseTime()
-//    #if DEBUG
-//    if let text = String(data: data, encoding: .utf8) {
-//        print(text)
-//    }
-//    #endif
+    #if DEBUG
+    if let text = String(data: data, encoding: .utf8) {
+        print(text)
+    }
+    #endif
     
     do {
         let result = try jsonDecoder.decode(T.self, from: data)
@@ -145,41 +151,41 @@ private func ensureIsOnBackground<T>(work: @escaping () -> T) async -> T {
 // It probably require more research
 enum NetworkManagerError: Error {
     // User disabled interent -> prompt to enable internet
-    case internetDisabled
+    case internetDisabled(genericError: Error?)
     // For example WI-FI have no acces to internet -> prompt to check other network
-    case noNetworkAccess
+    case noNetworkAccess(genericError: Error?)
     // Something happened (most likely timeout) -> prompt to try again later
-    case otherNetworkingError
+    case otherNetworkingError(genericError: Error?)
 }
 
 
-final class NetworkManager: Sendable {
-    private let apiUrlSession = URLSession.shared
-    private let staticDataUrlSession = {
-        let cache = URLCache(
-            memoryCapacity: 50 * 1024 * 1024, //  ~50 MB
-            diskCapacity: 200 * 1024 * 1024   // ~200 MB
-        )
-        let configuration = URLSessionConfiguration.default
-        configuration.urlCache = cache
-        configuration.requestCachePolicy = .returnCacheDataElseLoad
-        return URLSession(configuration: configuration)
-    }()
+class NetworkManager: @unchecked Sendable {
+    private let apiUrlSession: URLSession
+    private let staticDataUrlSession: URLSession
     
-    func performApiRequest(request: URLRequest) async -> Result<(Data, URLResponse), NetworkManagerError> {
-        return await Self.performRequest(
+    
+    init(
+        apiUrlSession: URLSession,
+        staticDataUrlSession: URLSession
+    ) {
+        self.apiUrlSession = apiUrlSession
+        self.staticDataUrlSession = staticDataUrlSession
+    }
+    
+    final func performApiRequest(request: URLRequest) async -> Result<(Data, URLResponse), NetworkManagerError> {
+        return await performRequest(
             urlSession: apiUrlSession,
             request: Int.random(in: 1...10) > 3 ? request : Self.RequestThatShouldFail
         )
     }
     
-    func performStaticRequest(request: URLRequest) async -> Result<(Data, URLResponse), NetworkManagerError> {
-        return await Self.performRequest(
+    final func performStaticRequest(request: URLRequest) async -> Result<(Data, URLResponse), NetworkManagerError> {
+        return await performRequest(
             urlSession: staticDataUrlSession, request: request
         )
     }
     
-    private static func performRequest(
+    fileprivate func performRequest(
         urlSession: URLSession,
         request: URLRequest
     ) async -> Result<(Data, URLResponse), NetworkManagerError> {
@@ -196,14 +202,14 @@ final class NetworkManager: Sendable {
             if let urlError = error as? URLError {
                 switch urlError.code {
                 case .notConnectedToInternet, .internationalRoamingOff, .dataNotAllowed:
-                    parsedError = .internetDisabled
+                    parsedError = .internetDisabled(genericError: error)
                 case .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed, .networkConnectionLost:
-                    parsedError = .noNetworkAccess
+                    parsedError = .noNetworkAccess(genericError: error)
                 default:
-                    parsedError = .otherNetworkingError
+                    parsedError = .otherNetworkingError(genericError: error)
                 }
             } else {
-                parsedError = .otherNetworkingError
+                parsedError = .otherNetworkingError(genericError: error)
             }
             
             let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - requestStart)
@@ -219,7 +225,7 @@ final class NetworkManager: Sendable {
         }
     }
     
-    private static let RequestThatShouldFail: URLRequest = {
+    fileprivate static let RequestThatShouldFail: URLRequest = {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "thisshouldfail.com"
@@ -234,5 +240,57 @@ final class NetworkManager: Sendable {
 private extension URLRequest {
     var diagnosticDescription: String {
         return url?.absoluteString ?? "--- we do not have url WTF bro? ---"
+    }
+}
+
+
+// Potentially we should hide it via #if DEBUG
+final class MockedNetworkManager: NetworkManager, @unchecked Sendable {
+    private let mock: @Sendable (ParsedRequest) async -> Result<(Data, URLResponse), NetworkManagerError>
+    
+    enum ParsedRequest {
+        case charactersList
+        case characterDetails(id: Int)
+        case unknown(request: URLRequest)
+        case uselessFailingRequest
+        case location(url: String)
+        
+        init(request: URLRequest) {
+            if request == NetworkManager.RequestThatShouldFail {
+                self = .uselessFailingRequest
+                return
+            }
+            
+            if request.url?.path == "/api/character/[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" {
+                self = .charactersList
+                return
+            }
+            if request.url?.path.starts(with: "/api/character/") == true {
+                let components = request.url!.pathComponents
+                if components.count == 4, let id = Int(components[3]) {
+                    self = .characterDetails(id: id)
+                    return
+                }
+            }
+            if request.url?.path.contains("/api/location/") == true {
+                self = .location(url: request.url!.absoluteString)
+                return
+            }
+            self = .unknown(request: request)
+        }
+    }
+    
+    init(
+        mock: @escaping @Sendable (ParsedRequest) async -> Result<(Data, URLResponse), NetworkManagerError>
+    ) {
+        self.mock = mock
+        super.init(apiUrlSession: .shared, staticDataUrlSession: .shared)
+    }
+    
+    override func performRequest(
+        urlSession: URLSession,
+        request: URLRequest
+    ) async -> Result<(Data, URLResponse), NetworkManagerError> {
+        return await mock(ParsedRequest(request: request))
     }
 }

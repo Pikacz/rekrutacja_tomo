@@ -68,7 +68,7 @@ struct characterListCell_Previews: PreviewProvider {
             title: CharacterResponseModel.dummy.name,
             created: CharacterResponseModel.dummy.created,
             url: CharacterResponseModel.dummy.url,
-            image: AppRepository.shared.images.getOptionalImage(
+            image: AppRepository.previewInstance.images.getOptionalImage(
                 url: URL(string: CharacterResponseModel.dummy.image)
             )
         )

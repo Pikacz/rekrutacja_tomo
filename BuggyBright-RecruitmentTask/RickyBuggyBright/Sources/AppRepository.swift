@@ -361,18 +361,64 @@ final class ImagesRepository {
 
 @MainActor
 final class AppRepository {
-    static let shared = AppRepository()
-    
-    private let apiClient: APIClient = APIClient()
+    private let apiClient: APIClient
     
     let characters: CharactersRepository
     let locations: LocationsRepository
     let images: ImagesRepository
     
-    init() {
+    init(
+        baseUrl: String = "https://rickandmortyapi.com",
+        networkManager: NetworkManager = NetworkManager(
+            apiUrlSession: URLSession.shared,
+            staticDataUrlSession: {
+                // This code is suposed to aggresivly cache images
+                let cache = URLCache(
+                    memoryCapacity: 50 * 1024 * 1024, //  ~50 MB
+                    diskCapacity: 200 * 1024 * 1024   // ~200 MB
+                )
+                let configuration = URLSessionConfiguration.default
+                configuration.urlCache = cache
+                configuration.requestCachePolicy = .returnCacheDataElseLoad
+                return URLSession(configuration: configuration)
+            }()
+        )
+    ) {
+        self.apiClient = APIClient(
+            baseUrl: baseUrl,
+            networkManager: networkManager
+        )
+        
         self.characters = CharactersRepository(apiClient: apiClient)
         self.locations = LocationsRepository(apiClient: apiClient)
         self.images = ImagesRepository(apiClient: apiClient)
     }
     
+    static let previewInstance = AppRepository(
+        networkManager: createMockedServer()
+    )
+}
+
+
+// Personally I would add #if DEBUG for previews
+func createMockedServer() -> NetworkManager {
+    MockedNetworkManager { request in
+        switch request {
+        case .charactersList:
+            let result = "[{\"id\":1,\"name\":\"Rick Sanchez\",\"status\":\"Alive\",\"species\":\"Human\",\"type\":\"\",\"gender\":\"Male\",\"origin\":{\"name\":\"Earth (C-137)\",\"url\":\"https://rickandmortyapi.com/api/location/1\"},\"location\":{\"name\":\"Citadel of Ricks\",\"url\":\"https://rickandmortyapi.com/api/location/3\"},\"image\":\"https://rickandmortyapi.com/api/character/avatar/1.jpeg\",\"episode\":[\"https://rickandmortyapi.com/api/episode/1\",\"https://rickandmortyapi.com/api/episode/2\",\"https://rickandmortyapi.com/api/episode/3\",\"https://rickandmortyapi.com/api/episode/4\",\"https://rickandmortyapi.com/api/episode/5\",\"https://rickandmortyapi.com/api/episode/6\",\"https://rickandmortyapi.com/api/episode/7\",\"https://rickandmortyapi.com/api/episode/8\",\"https://rickandmortyapi.com/api/episode/9\",\"https://rickandmortyapi.com/api/episode/10\",\"https://rickandmortyapi.com/api/episode/11\",\"https://rickandmortyapi.com/api/episode/12\",\"https://rickandmortyapi.com/api/episode/13\",\"https://rickandmortyapi.com/api/episode/14\",\"https://rickandmortyapi.com/api/episode/15\",\"https://rickandmortyapi.com/api/episode/16\",\"https://rickandmortyapi.com/api/episode/17\",\"https://rickandmortyapi.com/api/episode/18\",\"https://rickandmortyapi.com/api/episode/19\",\"https://rickandmortyapi.com/api/episode/20\",\"https://rickandmortyapi.com/api/episode/21\",\"https://rickandmortyapi.com/api/episode/22\",\"https://rickandmortyapi.com/api/episode/23\",\"https://rickandmortyapi.com/api/episode/24\",\"https://rickandmortyapi.com/api/episode/25\",\"https://rickandmortyapi.com/api/episode/26\",\"https://rickandmortyapi.com/api/episode/27\",\"https://rickandmortyapi.com/api/episode/28\",\"https://rickandmortyapi.com/api/episode/29\",\"https://rickandmortyapi.com/api/episode/30\",\"https://rickandmortyapi.com/api/episode/31\",\"https://rickandmortyapi.com/api/episode/32\",\"https://rickandmortyapi.com/api/episode/33\",\"https://rickandmortyapi.com/api/episode/34\",\"https://rickandmortyapi.com/api/episode/35\",\"https://rickandmortyapi.com/api/episode/36\",\"https://rickandmortyapi.com/api/episode/37\",\"https://rickandmortyapi.com/api/episode/38\",\"https://rickandmortyapi.com/api/episode/39\",\"https://rickandmortyapi.com/api/episode/40\",\"https://rickandmortyapi.com/api/episode/41\",\"https://rickandmortyapi.com/api/episode/42\",\"https://rickandmortyapi.com/api/episode/43\",\"https://rickandmortyapi.com/api/episode/44\",\"https://rickandmortyapi.com/api/episode/45\",\"https://rickandmortyapi.com/api/episode/46\",\"https://rickandmortyapi.com/api/episode/47\",\"https://rickandmortyapi.com/api/episode/48\",\"https://rickandmortyapi.com/api/episode/49\",\"https://rickandmortyapi.com/api/episode/50\",\"https://rickandmortyapi.com/api/episode/51\"],\"url\":\"https://rickandmortyapi.com/api/character/1\",\"created\":\"2017-11-04T18:48:46.250Z\"}]".data(using: .utf8)!
+            return .success((result, URLResponse()))
+        case .characterDetails:
+            let result = "{\"id\":1,\"name\":\"Rick Sanchez\",\"status\":\"Alive\",\"species\":\"Human\",\"type\":\"\",\"gender\":\"Male\",\"origin\":{\"name\":\"Earth (C-137)\",\"url\":\"https://rickandmortyapi.com/api/location/1\"},\"location\":{\"name\":\"Citadel of Ricks\",\"url\":\"https://rickandmortyapi.com/api/location/3\"},\"image\":\"https://rickandmortyapi.com/api/character/avatar/1.jpeg\",\"episode\":[\"https://rickandmortyapi.com/api/episode/1\",\"https://rickandmortyapi.com/api/episode/2\",\"https://rickandmortyapi.com/api/episode/3\",\"https://rickandmortyapi.com/api/episode/4\",\"https://rickandmortyapi.com/api/episode/5\",\"https://rickandmortyapi.com/api/episode/6\",\"https://rickandmortyapi.com/api/episode/7\",\"https://rickandmortyapi.com/api/episode/8\",\"https://rickandmortyapi.com/api/episode/9\",\"https://rickandmortyapi.com/api/episode/10\",\"https://rickandmortyapi.com/api/episode/11\",\"https://rickandmortyapi.com/api/episode/12\",\"https://rickandmortyapi.com/api/episode/13\",\"https://rickandmortyapi.com/api/episode/14\",\"https://rickandmortyapi.com/api/episode/15\",\"https://rickandmortyapi.com/api/episode/16\",\"https://rickandmortyapi.com/api/episode/17\",\"https://rickandmortyapi.com/api/episode/18\",\"https://rickandmortyapi.com/api/episode/19\",\"https://rickandmortyapi.com/api/episode/20\",\"https://rickandmortyapi.com/api/episode/21\",\"https://rickandmortyapi.com/api/episode/22\",\"https://rickandmortyapi.com/api/episode/23\",\"https://rickandmortyapi.com/api/episode/24\",\"https://rickandmortyapi.com/api/episode/25\",\"https://rickandmortyapi.com/api/episode/26\",\"https://rickandmortyapi.com/api/episode/27\",\"https://rickandmortyapi.com/api/episode/28\",\"https://rickandmortyapi.com/api/episode/29\",\"https://rickandmortyapi.com/api/episode/30\",\"https://rickandmortyapi.com/api/episode/31\",\"https://rickandmortyapi.com/api/episode/32\",\"https://rickandmortyapi.com/api/episode/33\",\"https://rickandmortyapi.com/api/episode/34\",\"https://rickandmortyapi.com/api/episode/35\",\"https://rickandmortyapi.com/api/episode/36\",\"https://rickandmortyapi.com/api/episode/37\",\"https://rickandmortyapi.com/api/episode/38\",\"https://rickandmortyapi.com/api/episode/39\",\"https://rickandmortyapi.com/api/episode/40\",\"https://rickandmortyapi.com/api/episode/41\",\"https://rickandmortyapi.com/api/episode/42\",\"https://rickandmortyapi.com/api/episode/43\",\"https://rickandmortyapi.com/api/episode/44\",\"https://rickandmortyapi.com/api/episode/45\",\"https://rickandmortyapi.com/api/episode/46\",\"https://rickandmortyapi.com/api/episode/47\",\"https://rickandmortyapi.com/api/episode/48\",\"https://rickandmortyapi.com/api/episode/49\",\"https://rickandmortyapi.com/api/episode/50\",\"https://rickandmortyapi.com/api/episode/51\"],\"url\":\"https://rickandmortyapi.com/api/character/1\",\"created\":\"2017-11-04T18:48:46.250Z\"}".data(using: .utf8)!
+            return .success((result, URLResponse()))
+        case .unknown:
+            let result = Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGNkYPjPwMDAxMDAwMDAAAALHwEDmIWXfgAAAABJRU5ErkJggg==")!
+            return .success((result, URLResponse()))
+            
+        case .uselessFailingRequest:
+            return .failure(.noNetworkAccess(genericError: nil))
+        case .location:
+            let result = "{\"id\":3,\"name\":\"Citadel of Ricks\",\"type\":\"Space station\",\"dimension\":\"unknown\",\"residents\":[\"https://rickandmortyapi.com/api/character/8\",\"https://rickandmortyapi.com/api/character/14\",\"https://rickandmortyapi.com/api/character/15\",\"https://rickandmortyapi.com/api/character/18\",\"https://rickandmortyapi.com/api/character/21\",\"https://rickandmortyapi.com/api/character/22\",\"https://rickandmortyapi.com/api/character/27\",\"https://rickandmortyapi.com/api/character/42\",\"https://rickandmortyapi.com/api/character/43\",\"https://rickandmortyapi.com/api/character/44\",\"https://rickandmortyapi.com/api/character/48\",\"https://rickandmortyapi.com/api/character/53\",\"https://rickandmortyapi.com/api/character/56\",\"https://rickandmortyapi.com/api/character/61\",\"https://rickandmortyapi.com/api/character/69\",\"https://rickandmortyapi.com/api/character/72\",\"https://rickandmortyapi.com/api/character/73\",\"https://rickandmortyapi.com/api/character/74\",\"https://rickandmortyapi.com/api/character/77\",\"https://rickandmortyapi.com/api/character/78\",\"https://rickandmortyapi.com/api/character/85\",\"https://rickandmortyapi.com/api/character/86\",\"https://rickandmortyapi.com/api/character/95\",\"https://rickandmortyapi.com/api/character/118\",\"https://rickandmortyapi.com/api/character/119\",\"https://rickandmortyapi.com/api/character/123\",\"https://rickandmortyapi.com/api/character/135\",\"https://rickandmortyapi.com/api/character/143\",\"https://rickandmortyapi.com/api/character/152\",\"https://rickandmortyapi.com/api/character/164\",\"https://rickandmortyapi.com/api/character/165\",\"https://rickandmortyapi.com/api/character/187\",\"https://rickandmortyapi.com/api/character/200\",\"https://rickandmortyapi.com/api/character/206\",\"https://rickandmortyapi.com/api/character/209\",\"https://rickandmortyapi.com/api/character/220\",\"https://rickandmortyapi.com/api/character/229\",\"https://rickandmortyapi.com/api/character/231\",\"https://rickandmortyapi.com/api/character/235\",\"https://rickandmortyapi.com/api/character/267\",\"https://rickandmortyapi.com/api/character/278\",\"https://rickandmortyapi.com/api/character/281\",\"https://rickandmortyapi.com/api/character/283\",\"https://rickandmortyapi.com/api/character/284\",\"https://rickandmortyapi.com/api/character/285\",\"https://rickandmortyapi.com/api/character/286\",\"https://rickandmortyapi.com/api/character/287\",\"https://rickandmortyapi.com/api/character/288\",\"https://rickandmortyapi.com/api/character/289\",\"https://rickandmortyapi.com/api/character/291\",\"https://rickandmortyapi.com/api/character/295\",\"https://rickandmortyapi.com/api/character/298\",\"https://rickandmortyapi.com/api/character/299\",\"https://rickandmortyapi.com/api/character/322\",\"https://rickandmortyapi.com/api/character/325\",\"https://rickandmortyapi.com/api/character/328\",\"https://rickandmortyapi.com/api/character/330\",\"https://rickandmortyapi.com/api/character/345\",\"https://rickandmortyapi.com/api/character/359\",\"https://rickandmortyapi.com/api/character/366\",\"https://rickandmortyapi.com/api/character/378\",\"https://rickandmortyapi.com/api/character/385\",\"https://rickandmortyapi.com/api/character/392\",\"https://rickandmortyapi.com/api/character/461\",\"https://rickandmortyapi.com/api/character/462\",\"https://rickandmortyapi.com/api/character/463\",\"https://rickandmortyapi.com/api/character/464\",\"https://rickandmortyapi.com/api/character/465\",\"https://rickandmortyapi.com/api/character/466\",\"https://rickandmortyapi.com/api/character/472\",\"https://rickandmortyapi.com/api/character/473\",\"https://rickandmortyapi.com/api/character/474\",\"https://rickandmortyapi.com/api/character/475\",\"https://rickandmortyapi.com/api/character/476\",\"https://rickandmortyapi.com/api/character/477\",\"https://rickandmortyapi.com/api/character/478\",\"https://rickandmortyapi.com/api/character/479\",\"https://rickandmortyapi.com/api/character/480\",\"https://rickandmortyapi.com/api/character/481\",\"https://rickandmortyapi.com/api/character/482\",\"https://rickandmortyapi.com/api/character/483\",\"https://rickandmortyapi.com/api/character/484\",\"https://rickandmortyapi.com/api/character/485\",\"https://rickandmortyapi.com/api/character/486\",\"https://rickandmortyapi.com/api/character/487\",\"https://rickandmortyapi.com/api/character/488\",\"https://rickandmortyapi.com/api/character/489\",\"https://rickandmortyapi.com/api/character/2\",\"https://rickandmortyapi.com/api/character/1\",\"https://rickandmortyapi.com/api/character/801\",\"https://rickandmortyapi.com/api/character/802\",\"https://rickandmortyapi.com/api/character/803\",\"https://rickandmortyapi.com/api/character/804\",\"https://rickandmortyapi.com/api/character/805\",\"https://rickandmortyapi.com/api/character/806\",\"https://rickandmortyapi.com/api/character/810\",\"https://rickandmortyapi.com/api/character/811\",\"https://rickandmortyapi.com/api/character/812\",\"https://rickandmortyapi.com/api/character/819\",\"https://rickandmortyapi.com/api/character/820\",\"https://rickandmortyapi.com/api/character/818\"],\"url\":\"https://rickandmortyapi.com/api/location/3\",\"created\":\"2017-11-10T13:08:13.191Z\"}".data(using: .utf8)!
+            return .success((result, URLResponse()))
+        }
+    }
 }

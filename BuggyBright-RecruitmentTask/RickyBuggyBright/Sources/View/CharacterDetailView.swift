@@ -201,13 +201,17 @@ struct CharacterDetailView: View {
 
 private extension CharacterDetailView {
     @ViewBuilder var content: some View {
-        
-        if !viewModel.characterErrors.isEmpty {
+        if let characterDetailsError = viewModel.characterDetailsError {
             FetchRetryView(
-                errors: viewModel.characterErrors,
-                onRetry: {
-                    viewModel.downloadIfNeeded()
-                }
+                mainMessage: "Unable to download details of character",
+                underlyingError: characterDetailsError,
+                onRetry: { viewModel.downloadIfNeeded() }
+            )
+        } else if let locationDetailsError = viewModel.locationDetailsError {
+            FetchRetryView(
+                mainMessage: "Unable to download current location of character",
+                underlyingError: locationDetailsError,
+                onRetry: { viewModel.downloadIfNeeded() }
             )
         } else if viewModel.characterDetails != nil || viewModel.characterFromListDetails != nil {
             ScrollView {
@@ -335,14 +339,12 @@ private extension CharacterDetailView {
                     }
             }
         }
-    }
-    
-    // MARK: - Preview
-    
-    struct CharacterDetailView_Previews: PreviewProvider {
-        static var previews: some View {
-            CharacterDetailView(id: 1, appRepository: AppRepository.shared)
-        }
-    }
+    }    
 }
     
+// MARK: - Preview
+struct CharacterDetailView_Previews: PreviewProvider {
+    static var previews: some View {
+        CharacterDetailView(id: 1, appRepository: AppRepository.previewInstance)
+    }
+}

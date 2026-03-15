@@ -129,10 +129,13 @@ struct AppMainView: View {
                 appRepository: appRespository
             )
         } else if let downloadError = viewModel.downloadError {
-            // FIXME: Error messages
-            FetchRetryView(errors: [downloadError], onRetry: {
-                viewModel.downloadIfNeeded()
-            })
+            FetchRetryView(
+                mainMessage: "Unable to download list of characters",
+                underlyingError: downloadError,
+                onRetry: {
+                    viewModel.downloadIfNeeded()
+                }
+            )
         } else {
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle())
@@ -171,6 +174,6 @@ struct AppMainView: View {
 
 struct AppMainView_Previews: PreviewProvider {
     static var previews: some View {
-        AppMainView(appRespository: AppRepository.shared)
+        AppMainView(appRespository: AppRepository.previewInstance)
     }
 }
