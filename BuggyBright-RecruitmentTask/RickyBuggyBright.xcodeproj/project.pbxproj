@@ -18,7 +18,6 @@
 		C5B5769E2F659A4C00902D32 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B5768A2F659A4C00902D32 /* APIClient.swift */; };
 		C5B5769F2F659A4C00902D32 /* CharactersListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576972F659A4C00902D32 /* CharactersListItemView.swift */; };
 		C5B576A02F659A4C00902D32 /* LocationDetailsResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576852F659A4C00902D32 /* LocationDetailsResponseModel.swift */; };
-		C5B576A12F659A4C00902D32 /* AppMainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576942F659A4C00902D32 /* AppMainViewModel.swift */; };
 		C5B576A32F659A4C00902D32 /* CharactersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576992F659A4C00902D32 /* CharactersListView.swift */; };
 		C5B576A42F659A4C00902D32 /* AppMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576932F659A4C00902D32 /* AppMainView.swift */; };
 		C5B576A52F659A4C00902D32 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B5768D2F659A4C00902D32 /* APIError.swift */; };
@@ -31,7 +30,6 @@
 		C5B576AD2F659A4C00902D32 /* CharactersResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576842F659A4C00902D32 /* CharactersResponseModel.swift */; };
 		C5B576AE2F659A4C00902D32 /* CharacterDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576952F659A4C00902D32 /* CharacterDetailView.swift */; };
 		C5B576AF2F659A4C00902D32 /* AppearanceFrequency.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576802F659A4C00902D32 /* AppearanceFrequency.swift */; };
-		C5B576B02F659A4C00902D32 /* CharactersListItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576982F659A4C00902D32 /* CharactersListItemViewModel.swift */; };
 		C5B576D42F65CF7A00902D32 /* Diagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B576D32F65CF7500902D32 /* Diagnostics.swift */; };
 /* End PBXBuildFile section */
 
@@ -66,11 +64,9 @@
 		C5B5768F2F659A4C00902D32 /* CharacterPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterPhoto.swift; sourceTree = "<group>"; };
 		C5B576912F659A4C00902D32 /* TextExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextExtensions.swift; sourceTree = "<group>"; };
 		C5B576932F659A4C00902D32 /* AppMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMainView.swift; sourceTree = "<group>"; };
-		C5B576942F659A4C00902D32 /* AppMainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMainViewModel.swift; sourceTree = "<group>"; };
 		C5B576952F659A4C00902D32 /* CharacterDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailView.swift; sourceTree = "<group>"; };
 		C5B576962F659A4C00902D32 /* CharacterDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailViewModel.swift; sourceTree = "<group>"; };
 		C5B576972F659A4C00902D32 /* CharactersListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersListItemView.swift; sourceTree = "<group>"; };
-		C5B576982F659A4C00902D32 /* CharactersListItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersListItemViewModel.swift; sourceTree = "<group>"; };
 		C5B576992F659A4C00902D32 /* CharactersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersListView.swift; sourceTree = "<group>"; };
 		C5B5769A2F659A4C00902D32 /* FetchRetryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRetryView.swift; sourceTree = "<group>"; };
 		C5B576D32F65CF7500902D32 /* Diagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics.swift; sourceTree = "<group>"; };
@@ -199,11 +195,9 @@
 				C5B576902F659A4C00902D32 /* Blocks */,
 				C5B576922F659A4C00902D32 /* Extensions */,
 				C5B576932F659A4C00902D32 /* AppMainView.swift */,
-				C5B576942F659A4C00902D32 /* AppMainViewModel.swift */,
 				C5B576952F659A4C00902D32 /* CharacterDetailView.swift */,
 				C5B576962F659A4C00902D32 /* CharacterDetailViewModel.swift */,
 				C5B576972F659A4C00902D32 /* CharactersListItemView.swift */,
-				C5B576982F659A4C00902D32 /* CharactersListItemViewModel.swift */,
 				C5B576992F659A4C00902D32 /* CharactersListView.swift */,
 				C5B5769A2F659A4C00902D32 /* FetchRetryView.swift */,
 			);
@@ -351,7 +345,6 @@
 				C5B5769E2F659A4C00902D32 /* APIClient.swift in Sources */,
 				C5B5769F2F659A4C00902D32 /* CharactersListItemView.swift in Sources */,
 				C5B576A02F659A4C00902D32 /* LocationDetailsResponseModel.swift in Sources */,
-				C5B576A12F659A4C00902D32 /* AppMainViewModel.swift in Sources */,
 				C5B576A32F659A4C00902D32 /* CharactersListView.swift in Sources */,
 				C539F2542F65EFDC008E28D0 /* AppRepository.swift in Sources */,
 				C5B576A42F659A4C00902D32 /* AppMainView.swift in Sources */,
@@ -366,7 +359,6 @@
 				C5B576AD2F659A4C00902D32 /* CharactersResponseModel.swift in Sources */,
 				C5B576AE2F659A4C00902D32 /* CharacterDetailView.swift in Sources */,
 				C5B576AF2F659A4C00902D32 /* AppearanceFrequency.swift in Sources */,
-				C5B576B02F659A4C00902D32 /* CharactersListItemViewModel.swift in Sources */,
 				2C2308BF282A3FD8003EC7DC /* RickyBuggyBrightApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

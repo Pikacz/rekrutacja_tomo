@@ -88,7 +88,7 @@ private func decode<T: Decodable>(
     do {
         let result = try jsonDecoder.decode(T.self, from: data)
         let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - parsingStart)
-        diagnosticsAddBreadcrumb(message: "Parsing \(request.diagnosticDescription) succeded after \(elapsedMs) ms")
+        diagnosticsAddBreadcrumb(message: "Request \(request.diagnosticDescription) parsed after \(elapsedMs) ms")
         return result
     } catch {
         let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - parsingStart)
@@ -167,7 +167,7 @@ final class NetworkManager: Sendable {
         do {
             let result = try await urlSession.data(for: request)
             let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - requestStart)
-            diagnosticsAddBreadcrumb(message: "Request \(request.diagnosticDescription) succeded after \(elapsedMs) ms")
+            diagnosticsAddBreadcrumb(message: "Request \(request.diagnosticDescription) downloaded after \(elapsedMs) ms")
             return .success(result)
         } catch {
             let elapsedMs = diagnosticsTimeToMiliseconds(diagnosticsCheapToUseTime() - requestStart)

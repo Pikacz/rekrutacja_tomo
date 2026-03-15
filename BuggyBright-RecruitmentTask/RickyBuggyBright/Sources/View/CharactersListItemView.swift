@@ -6,15 +6,21 @@
 import SwiftUI
 
 struct CharactersListItemView: View {
-    @ObservedObject private var viewModel: CharactersListItemViewModel
+    private let title: String
+    private let created: String
+    private let url: String
+    private let image: ImageModel?
     
-    init(viewModel: CharactersListItemViewModel) {
-        self.viewModel = viewModel
+    init(title: String, created: String, url: String, image: ImageModel?) {
+        self.title = title
+        self.created = created
+        self.url = url
+        self.image = image
     }
     
     var body: some View {
         HStack {
-            CharacterPhoto(imageModel: viewModel.imageUrl.map { AppRepository.shared.images.getImage(url: $0) })
+            CharacterPhoto(imageModel: image)
                 .aspectRatio(1, contentMode: .fill)
                 .frame(height: UIScreen.main.bounds.height / 5)
                 .cornerRadius(5)
@@ -23,7 +29,7 @@ struct CharactersListItemView: View {
                 Spacer()
                 
                 HStack(alignment: .center) {
-                    Text(viewModel.title)
+                    Text(title)
                         .titleStyle()
                                                             
                     Spacer()
@@ -34,9 +40,9 @@ struct CharactersListItemView: View {
                 HStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 4) {
                         // FIXME: 6 - Make URL tappable
-                        Text(viewModel.url)
+                        Text(url)
 
-                        Text(viewModel.created)
+                        Text(created)
                             .contentsStyle()
                     }
                 }
@@ -51,7 +57,13 @@ struct CharactersListItemView: View {
 
 struct characterListCell_Previews: PreviewProvider {
     static var previews: some View {
-        CharactersListItemView(viewModel: CharactersListItemViewModel(character: .dummy))
-            .frame(maxHeight: UIScreen.main.bounds.height / 5)
+        CharactersListItemView(
+            title: CharacterResponseModel.dummy.name,
+            created: CharacterResponseModel.dummy.created,
+            url: CharacterResponseModel.dummy.url,
+            image: AppRepository.shared.images.getOptionalImage(
+                url: URL(string: CharacterResponseModel.dummy.image)
+            )
+        )
     }
 }

@@ -324,6 +324,11 @@ final class ImagesRepository {
     }
     
     
+    func getOptionalImage(url: URL?) -> ImageModel? {
+        guard let url else { return nil }
+        return getImage(url: url)
+    }
+    
     func getImage(url: URL) -> ImageModel {
         tryClearCacheCounter += 1
         if tryClearCacheCounter >= 60 { // Randomly picked value that should make sense

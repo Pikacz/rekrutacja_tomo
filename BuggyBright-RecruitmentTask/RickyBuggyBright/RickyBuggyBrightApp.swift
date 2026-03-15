@@ -23,7 +23,7 @@ struct RickyBuggyBrightApp: App {
                 }
                 
                 if(isListHidden) {
-                    AppMainView()
+                    AppMainView(appRespository: AppRepository.shared)
                 }
             }
         }
