@@ -35,9 +35,9 @@ final class APIClient: Sendable {
         )
         switch(result) {
         case .success(let (data, _)):
-#if DEBUG
-            print(data.base64EncodedString())
-#endif
+//#if DEBUG
+//            print(data.base64EncodedString())
+//#endif
             return .success(await ensureIsOnBackground {
                 let parsingStart = diagnosticsCheapToUseTime()
                 let result = UIImage(data: data)
@@ -99,11 +99,11 @@ private func decode<T: Decodable>(
     data: Data
 ) throws -> T {
     let parsingStart = diagnosticsCheapToUseTime()
-    #if DEBUG
-    if let text = String(data: data, encoding: .utf8) {
-        print(text)
-    }
-    #endif
+//    #if DEBUG
+//    if let text = String(data: data, encoding: .utf8) {
+//        print(text)
+//    }
+//    #endif
     
     do {
         let result = try jsonDecoder.decode(T.self, from: data)
