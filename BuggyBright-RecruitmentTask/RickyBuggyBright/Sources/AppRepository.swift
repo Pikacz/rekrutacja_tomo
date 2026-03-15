@@ -175,7 +175,7 @@ final class CharactersRepository {
 
 @MainActor
 final class LocationDetailsModel {
-    private let id: Int
+    private let url: URL
     
     private let _lastApiDetails = CurrentValueSubject<
         Result<LocationDetailsResponseModel, ApiClientError>?,
@@ -200,8 +200,8 @@ final class LocationDetailsModel {
     private let apiClient: APIClient
     
     
-    init(id: Int, apiClient: APIClient) {
-        self.id = id
+    init(url: URL, apiClient: APIClient) {
+        self.url = url
         self.apiClient = apiClient
     }
     
@@ -213,7 +213,7 @@ final class LocationDetailsModel {
         let thisRequestId = requestId
         
         Task.detached {
-            let result = await self.apiClient.downloadLocationDetails(id: "\(self.id)")
+            let result = await self.apiClient.downloadLocationDetails(url: self.url)
             Task.detached { @MainActor in
                 guard thisRequestId == self.requestId else { return }
                 self._lastApiDetails.value = result
@@ -225,9 +225,9 @@ final class LocationDetailsModel {
 
 @MainActor
 final class LocationsRepository {
-    private var locationsCache: [Int: WeakReference<LocationDetailsModel>] = [:]
-    private let locationsLifetimeCache: NSCache<NSNumber, LocationDetailsModel> = {
-        let locationsLifetimeCache = NSCache<NSNumber, LocationDetailsModel>()
+    private var locationsCache: [URL: WeakReference<LocationDetailsModel>] = [:]
+    private let locationsLifetimeCache: NSCache<NSURL, LocationDetailsModel> = {
+        let locationsLifetimeCache = NSCache<NSURL, LocationDetailsModel>()
         locationsLifetimeCache.countLimit = 30 // Randomly picked value that should make sense
         return locationsLifetimeCache
     }()
@@ -238,23 +238,28 @@ final class LocationsRepository {
         self.apiClient = apiClient
     }
     
-    func getLocation(id: Int) -> LocationDetailsModel {
+    func getLocation(urlString: String) -> LocationDetailsModel? {
+        guard let url = URL(string: urlString) else { return nil }
+        return getLocation(url: url)
+    }
+    
+    func getLocation(url: URL) -> LocationDetailsModel {
         tryClearCacheCounter += 1
         if tryClearCacheCounter >= 60 { // Randomly picked value that should make sense
             removeDead(&locationsCache)
             tryClearCacheCounter = 0
         }
         
-        let result = if let existing = locationsCache[id]?.value {
+        let result = if let existing = locationsCache[url]?.value {
             existing
         } else {
             {
-                let newInstance = LocationDetailsModel(id: id, apiClient: apiClient)
-                locationsCache[id] = WeakReference(value: newInstance)
+                let newInstance = LocationDetailsModel(url: url, apiClient: apiClient)
+                locationsCache[url] = WeakReference(value: newInstance)
                 return newInstance
             }()
         }
-        locationsLifetimeCache.setObject(result, forKey: NSNumber(value: id))
+        locationsLifetimeCache.setObject(result, forKey: url as NSURL)
         return result
     }
 }

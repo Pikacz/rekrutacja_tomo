@@ -3,7 +3,6 @@
 //  RickyBuggyBright
 //
 
-// FIXME: 5 - Fix sorting, so it works - and sorts downloaded characters
 enum SortMethod: Int {
     case name
     case episodesCount

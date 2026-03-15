@@ -6,32 +6,39 @@
 import Combine
 import SwiftUI
 
-struct AppMainView: View {
-    private let appRespository: AppRepository
+
+@MainActor
+final class AppMainViewModel: ObservableObject {
+    @Published private(set) var sortingMethod: SortMethod? = nil
+    @Published private(set) var downloadedCharacters: [CharacterResponseModel] = []
+    @Published var sortedCharactersIndicies: [IndexWithId] = []
+    @Published private(set) var downloadError: ApiClientError? = nil
+    @Published var showsSortActionSheet: Bool = false
     
-    @State var sortingMethod: SortMethod? = nil
-    @State var downloadedCharacters: [CharacterResponseModel] = []
-    @State var sortedCharactersIndicies: [Int] = []
-    @State var downloadError: ApiClientError? = nil
-    @State var showsSortActionSheet: Bool = false
     
+    private var cancellables = [AnyCancellable]()
     
-    init(
-        appRespository: AppRepository
-    ) {
+    let appRespository: AppRepository
+    
+    var id: ObjectIdentifier { return ObjectIdentifier(appRespository) }
+    
+    init(appRespository: AppRepository) {
         self.appRespository = appRespository
         processCharactersResponse(
             result: appRespository.characters.lastAllCharacters
         )
+        appRespository.characters.lastAllCharactersPublisher.sink { [weak self] in
+            self?.processCharactersResponse(result: $0)
+        }.store(in: &cancellables)
     }
     
-    // FIXME: 13 - fix issue with re-invoking processing on tapping show list/hide list
     private func processCharactersResponse(result: Result<[CharacterResponseModel], ApiClientError>?) {
-        print("🦖🦕 processing response - make sure that this is not called to often!")
         switch result {
         case .success(let characters):
             downloadedCharacters = characters
-            sortedCharactersIndicies = [Int](characters.indices)
+            sortedCharactersIndicies = characters.indices.map {
+                IndexWithId(index: $0, id: characters[$0].id)
+            }
             if let sortingMethod {
                 sortCharacters(sortingMethod)
             }
@@ -52,24 +59,45 @@ struct AppMainView: View {
         switch method {
         case .name:
             sortedCharactersIndicies.sort { lhs, rhs in
-                downloadedCharacters[lhs].name < downloadedCharacters[rhs].name
+                downloadedCharacters[lhs.index].name < downloadedCharacters[rhs.index].name
             }
         case .episodesCount:
             sortedCharactersIndicies.sort { lhs, rhs in
-                downloadedCharacters[lhs].episode.count > downloadedCharacters[rhs].episode.count
+                downloadedCharacters[lhs.index].episode.count > downloadedCharacters[rhs.index].episode.count
             }
         case nil:
-            sortedCharactersIndicies.sort()
+            sortedCharactersIndicies.sort {
+                $0.index < $1.index
+            }
         }
     }
     
-    private func setSorting(_ method: SortMethod?) {
+    func setSorting(_ method: SortMethod?) {
         self.sortingMethod = method
         sortCharacters(sortingMethod)
     }
     
+    func downloadIfNeeded() {
+        appRespository.characters.downloadAllCharactersIfNeeded()
+    }
+}
+
+
+struct AppMainView: View {
+    @StateObject var viewModel: AppMainViewModel
+    
+    
+
+    
+    init(
+        appRespository: AppRepository
+    ) {
+        self._viewModel = StateObject(wrappedValue: AppMainViewModel(appRespository: appRespository))
+    }
+        
     var body: some View {
         NavigationView {
+            
             characterListView
                 .navigationTitle(Text("Characters"))
                 .navigationBarTitleDisplayMode(.automatic)
@@ -80,28 +108,29 @@ struct AppMainView: View {
                     }
                 }
         }
+        .id(viewModel.id)
         .onAppear {
-            appRespository.characters.downloadAllCharactersIfNeeded()
+            viewModel.downloadIfNeeded()
         }
-        .onReceive(appRespository.characters.lastAllCharactersPublisher) {
-            self.processCharactersResponse(result: $0)
-        }
-        .actionSheet(isPresented: $showsSortActionSheet) {
+        .actionSheet(isPresented: $viewModel.showsSortActionSheet) {
             sortActionSheet
         }
     }
-}
-
-// MARK: - View
-
-private extension AppMainView {
-    @ViewBuilder var characterListView: some View {
-        if downloadedCharacters.isEmpty == false {
-            CharactersListView(characters: $downloadedCharacters, charactersSortedIndicies: $sortedCharactersIndicies)
-        } else if let downloadError {
+    
+    private func setSortingAnimated(_ method: SortMethod?) {
+        guard viewModel.sortingMethod != method else { return }
+        withAnimation {
+            viewModel.setSorting(method)
+        }
+    }
+    
+    @ViewBuilder private var characterListView: some View {
+        if viewModel.downloadedCharacters.isEmpty == false {
+            CharactersListView(characters: viewModel.downloadedCharacters, charactersSortedIndicies: viewModel.sortedCharactersIndicies)
+        } else if let downloadError = viewModel.downloadError {
             // FIXME: Error messages
             FetchRetryView(errors: [downloadError], onRetry: {
-                appRespository.characters.downloadAllCharactersIfNeeded()
+                viewModel.downloadIfNeeded()
             })
         } else {
             ProgressView()
@@ -110,26 +139,25 @@ private extension AppMainView {
     }
 
     var sortButton: some View {
-        Button(action: { showsSortActionSheet = true }) {
+        Button(action: { viewModel.showsSortActionSheet = true }) {
             Text("Choose Sorting")
         }
     }
     
-    // FIXME: 8 - Fix action sheet only appearing once, in other words - after it gets opened and closed, it cannot be opened again
-    var sortActionSheet: ActionSheet {
+    private var sortActionSheet: ActionSheet {
         ActionSheet(
             title: Text("Sort method"),
             message: Text("Choose sorting method"),
             buttons: [
                 .default(Text("Episodes Count")) {
-                    setSorting(.episodesCount)
+                    setSortingAnimated(.episodesCount)
                 },
                 .default(Text("Name")) {
-                    setSorting(.name)
+                    setSortingAnimated(.name)
                     
                 },
                 .default(Text("Default")) {
-                    setSorting(nil)
+                    setSortingAnimated(nil)
                 },
                 
                 .cancel(Text("Cancel")),

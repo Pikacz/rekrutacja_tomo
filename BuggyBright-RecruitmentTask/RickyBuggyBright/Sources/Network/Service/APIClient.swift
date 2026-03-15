@@ -53,12 +53,12 @@ final class APIClient: Sendable {
         )
     }
     
-    func downloadLocationDetails(id: String) async -> Result<LocationDetailsResponseModel, ApiClientError> {
-        return await downloadAndParse(
-            request: URLRequest(
-                url: URL(string: baseUrl + "/api/location/\(id)")!
-            )
-        )
+    func locationDetailsUrl(id: String) -> URL {
+        return URL(string: baseUrl + "/api/location/\(id)")!
+    }
+    
+    func downloadLocationDetails(url: URL) async -> Result<LocationDetailsResponseModel, ApiClientError> {
+        return await downloadAndParse(request: URLRequest(url: url))
     }
     
     private func downloadAndParse<T: Decodable>(request: URLRequest) async -> Result<T, ApiClientError> {

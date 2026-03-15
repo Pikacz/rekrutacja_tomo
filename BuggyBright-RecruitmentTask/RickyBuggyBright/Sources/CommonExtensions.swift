@@ -7,6 +7,11 @@
 
 import Foundation
 
+struct IndexWithId: Identifiable, Equatable {
+    let index: Int
+    let id: Int
+}
+
 extension Result {
     var _isSuccess: Bool {
         if case .success = self {

@@ -112,7 +112,7 @@ final class CharacterDetailViewModel: ObservableObject {
             switch characterDetailsResponse {
             case .success(let characterDetails):
                 // FIXME: 11 - FIX so location is fetched based on character location id
-                let locationDetailsResponse = await apiService.downloadLocationDetails(id: "2")
+                let locationDetailsResponse = await apiService.downloadLocationDetails(url: apiService.locationDetailsUrl(id: "2"))
                 DispatchQueue.main.async {
                     switch locationDetailsResponse {
                     case .success(let locationDetails):
