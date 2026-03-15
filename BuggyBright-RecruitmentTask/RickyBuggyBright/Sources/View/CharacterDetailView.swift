@@ -230,14 +230,15 @@ private extension CharacterDetailView {
 // MARK: - Section: Photo
 
 private extension CharacterDetailView {
-    // FIXME: 10 - Fix so image isn't cropped and still looks good (see Morty for example of how broken it is now)
     var photoSection: some View {
-        VStack(alignment: .center, spacing: 8) {
+        HStack(alignment: .center, spacing: 8) {
             CharacterPhoto(imageModel: viewModel.characterPhoto)
                 .aspectRatio(1, contentMode: .fill)
                 .frame(height: UIScreen.main.bounds.height / 5)
                 .cornerRadius(5)
+                .fixedSize(horizontal: true, vertical: false)
         }
+        .frame(maxWidth: .infinity, alignment: .center)
         .padding()
     }
 }
