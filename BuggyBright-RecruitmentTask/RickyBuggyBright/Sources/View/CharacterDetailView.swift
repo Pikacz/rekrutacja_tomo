@@ -18,7 +18,6 @@ final class CharacterDetailViewModel: ObservableObject {
     @Published private(set) var locationDetails: LocationDetailsResponseModel?
     @Published private(set) var characterDoNotHaveLocation: Bool = false
     @Published private(set) var locationDetailsError: ApiClientError?
-    @Published private(set) var isDownloadingLocationDetails: Bool = false
     
     @Published private(set) var title: String = "-"
     
@@ -58,12 +57,16 @@ final class CharacterDetailViewModel: ObservableObject {
         characterModel = appRepository.characters.getDetails(id: id)
         
         processCharacterFromListResponse(character: characterModel.lastListResponse)
-        characterModel.lastListResponsePublisher.sink { [weak self] in
-            self?.processCharacterFromListResponse(character: $0)
+        characterModel.lastListResponsePublisher.sink { [weak self] character in
+            DispatchQueue.main.async {
+                self?.processCharacterFromListResponse(character: character)
+            }
         }.store(in: &cancellables)
         processCharacterDetailsResponse(response: characterModel.lastApiDetails)
-        characterModel.lastApiDetailsPublisher.sink { [weak self] in
-            self?.processCharacterDetailsResponse(response: $0)
+        characterModel.lastApiDetailsPublisher.sink { [weak self] result in
+            DispatchQueue.main.async {
+                self?.processCharacterDetailsResponse(response: result)
+            }
         }.store(in: &cancellables)
     }
     
@@ -128,7 +131,6 @@ final class CharacterDetailViewModel: ObservableObject {
             characterDoNotHaveLocation = true
             locationDetails = nil
             locationDetailsError = nil
-            isDownloadingLocationDetails = false
             return
         }
         guard newLocationModel !== locationModel else { return }
@@ -142,10 +144,6 @@ final class CharacterDetailViewModel: ObservableObject {
         processLocationDetails(result: newLocationModel.lastApiDetails)
         newLocationModel.lastApiDetailsPublisher.sink { [weak self] result in
             self?.processLocationDetails(result: result)
-        }.store(in: &locationCancellables)
-        isDownloadingLocationDetails = newLocationModel.isDownloading
-        newLocationModel.isDownloadingPublisher.sink { [weak self] in
-            self?.isDownloadingLocationDetails = $0
         }.store(in: &locationCancellables)
         newLocationModel.downloadIfNeeded()
     }

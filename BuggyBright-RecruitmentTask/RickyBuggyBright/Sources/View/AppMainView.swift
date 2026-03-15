@@ -27,8 +27,10 @@ final class AppMainViewModel: ObservableObject {
         processCharactersResponse(
             result: appRespository.characters.lastAllCharacters
         )
-        appRespository.characters.lastAllCharactersPublisher.sink { [weak self] in
-            self?.processCharactersResponse(result: $0)
+        appRespository.characters.lastAllCharactersPublisher.sink { [weak self] result in
+            DispatchQueue.main.async {
+                self?.processCharactersResponse(result: result)
+            }
         }.store(in: &cancellables)
     }
     
